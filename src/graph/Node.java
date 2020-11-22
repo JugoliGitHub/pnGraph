@@ -11,7 +11,7 @@ public class Node {
     this.label = label;
   }
 
-  protected Node(String label, int size){
+  protected Node(String label, int size) {
     this.label = label;
     this.preVector = new Vector(0);
     this.postVector = new Vector(0);
@@ -24,6 +24,10 @@ public class Node {
   public void setPreVector(Vector preVector) {
     this.preVector = preVector;
   }
+
+  public Vector getPreVector() { return preVector; }
+
+  public Vector getPostVector() { return postVector; }
 
   @Override
   public String toString() {
