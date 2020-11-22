@@ -51,13 +51,15 @@ public class Petrinet implements AddNodes {
   public void addPlaceNodes(String[] split) throws NotExistingNodeException {
     Place place = new Place(split[0], places.size());
     this.addPlace(place);
-    String[] toNodes = split[1].split(",");
-    if (toNodes.length > 0) {
-      for (String toNode : toNodes) {
-        this.addEdge(new Edge<>(place, new Transition(toNode)));
+    if(split.length > 1) {
+      String[] toNodes = split[1].split(",");
+      if (toNodes.length > 0) {
+        for (String toNode : toNodes) {
+          this.addEdge(new Edge<>(place, new Transition(toNode)));
         /*this.addEdge(new Edge<>(place,
             transitions.stream().filter(transition -> transition.toString().equals(toNode))
                 .findAny().orElseThrow(NotExistingNodeException::new)));*/
+        }
       }
     }
   }
@@ -83,6 +85,8 @@ public class Petrinet implements AddNodes {
       flow.forEach(edge -> {
         Node from = edge.getFrom();
         Node to = edge.getTo();
+        System.out.println(transitions);
+        System.out.println(transitions.indexOf(to));
         if (place.equals(to) && from.getClass() == Transition.class) {
           arrPre[transitions.indexOf(from)] += 1;
         } else if (place.equals(from) && to.getClass() == Transition.class) {
@@ -130,6 +134,6 @@ public class Petrinet implements AddNodes {
         transition -> out.append("  \"").append(transition.toString()).append("\" [shape=box];\n"));
     flow.forEach(edge -> out.append(edge.toString()));
     out.append("}");
-    return out.toString();
+    return out.append("\n").toString();
   }
 }
