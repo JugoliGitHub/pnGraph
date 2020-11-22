@@ -8,7 +8,7 @@ public class PetriReader {
 
   private static Petrinet petrinet;
 
-  private static boolean humanReadable, printPetriNet;
+  private static boolean humanReadable, printPetriNet, printCoverabilityGraph;
   private static String filenameCG, filenamePN;
 
   private static List<Vector> globalVisited;
@@ -16,6 +16,7 @@ public class PetriReader {
   public static void main(String[] args) throws NotExistingNodeException {
     humanReadable = false;
     printPetriNet = true;
+    printCoverabilityGraph = false;
     filenamePN = "petrinet.gv";
     filenameCG = "ueb.gv";
     String pnString = "";
@@ -37,6 +38,9 @@ public class PetriReader {
         }
       } else if (arg.equals("--printcover")) {
         printPetriNet = false;
+        printCoverabilityGraph = true;
+      } else if (arg.equals("--printboth")) {
+        printCoverabilityGraph = true;
       } else if (arg.startsWith("-p")) {
         pnString = arg.substring(2);
       } else if (arg.startsWith("-m")) {
@@ -52,13 +56,14 @@ public class PetriReader {
     readPnString(pnString, markingsString);
 
     // petrinet.setVectors();
-    // String coverabilityGraph =
+    CoverabilityGraph coverabilityGraph = createCoverabilityGraph(petrinet, filenameCG);
+
+    //print graphs to commandline
     if (printPetriNet) {
       System.out.print(petrinet.toString());
-    } else if (!printPetriNet) {
-      System.out.println("");
-    } else {
-      System.exit(0);
+    }
+    if (printCoverabilityGraph) {
+      System.out.println(coverabilityGraph.toString());
     }
   }
 
