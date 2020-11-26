@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/** A class to create coverability-graphs for a petri-net */
 public class CoverabilityGraph {
+
+  private Petrinet petrinet;
 
   private String name;
   private Vector mue0;
@@ -16,8 +19,8 @@ public class CoverabilityGraph {
   private List<CoverabilityGraphEdge> knots;
 
   private List<Vector> visited;
-  private Petrinet petrinet;
 
+  /** Constructor */
   public CoverabilityGraph(Vector mue0, String name, Petrinet petrinet)
       throws WrongDimensionException {
     this.name = name;
@@ -33,27 +36,50 @@ public class CoverabilityGraph {
     go(mue0, path);
   }
 
+  /**
+   * Adds a vector to the list markings, when it is not already present.
+   * @param mark marking that will be added if not present.
+   * @return false when present
+   */
   public boolean addToMarkings(Vector mark) {
     Optional<Vector> opt = markings.stream().filter(elem -> elem.equals(mark)).findFirst();
     return opt.isPresent() ? false : markings.add(mark);
   }
 
+  /**
+   * Adds a edge to the list knots, when it is not already present.
+   * @param edge edge that will be added if not present
+   * @return false when present
+   */
   public boolean addToKnots(CoverabilityGraphEdge edge) {
     Optional<CoverabilityGraphEdge> opt = knots.stream().filter(elem -> elem.equals(edge))
         .findFirst();
     return opt.isPresent() ? false : knots.add(edge);
   }
 
+  /**
+   * Adds a vector to the list of visited mues, when it is not already visited.
+   * @param newVector the new mue
+   * @return false when visited
+   */
   private boolean addToVisited(Vector newVector) {
     Optional<Vector> opt = visited.stream().filter(elem -> elem.equals(newVector)).findFirst();
     return opt.isPresent() ? false : visited.add(newVector);
   }
 
+  /**
+   * Fires a transition with a given mue, when possible. This method will create own front and end
+   * places if necessary. When the transition has them it will calculate the following state with
+   * them.
+   * @param mue current state of markings
+   * @param transition transition to be fired
+   * @return An Optional which is empty, when the transition could not be fired
+   * @throws WrongDimensionException when the vector has a different dimension
+   */
   private Optional<Vector> fire(Vector mue, Transition transition) throws WrongDimensionException {
-    // if: calculate post and pre vectors in method, else with vectors
+    Vector newMue = new Vector(mue.getLength());
+    newMue.add(mue);
     if (transition.getOutput().getLength() == 0 || transition.getInput().getLength() == 0) {
-      Vector newMue = new Vector(mue.getLength());
-      newMue.add(mue);
       if (petrinet.getTransitions().contains(transition)) {
         List<Place> front_places = new ArrayList<>();
         List<Place> end_places = new ArrayList<>();
@@ -68,9 +94,10 @@ public class CoverabilityGraph {
 
         for (Place place : front_places) {
           int index = petrinet.getPlaces().indexOf(place);
-          if (newMue.get(index) == 0) {
+          int newValueOfPlace = newMue.get(index);
+          if (newValueOfPlace == 0) {
             return Optional.empty();
-          } else if (newMue.get(index) >= 1) {
+          } else if (newValueOfPlace >= 1) {
             if (!newMue.subAtIndex(index, 1)) {
               return Optional.empty();
             }
@@ -78,17 +105,26 @@ public class CoverabilityGraph {
         }
         for (Place place : end_places) {
           int index = petrinet.getPlaces().indexOf(place);
+          int newValueOfPlace = newMue.get(index);
           newMue.addAtIndex(index, 1);
+          if(place.getBoundedness() < newValueOfPlace) place.setBoundedness(newValueOfPlace);
         }
-        if(transition.isDead()) transition.setLiveness(0);
-        return Optional.of(newMue);
       }
+    } else if(newMue.sub(transition.getInput())) {
+      newMue.add(transition.getOutput());
     } else {
-      //TODO: implement
+      return Optional.empty();
     }
-    return Optional.empty();
+    if(transition.isDead()) transition.setLiveness(0);
+    return Optional.of(newMue);
   }
 
+  /**
+   * Implementation of 'laufe' from Algorithm 1: uebGraph.
+   * @param mue given state of markings
+   * @param path path
+   * @throws WrongDimensionException when the vector has a different dimension
+   */
   private void go(Vector mue, List<Vector> path) throws WrongDimensionException {
     for (Transition transition : petrinet.getTransitions()) {
       Optional<Vector> newMueOptional = fire(mue, transition);
@@ -106,6 +142,11 @@ public class CoverabilityGraph {
     }
   }
 
+  /**
+   * Implementation of 'setzeOmega' from Algorithm 1: uebGraph
+   * @param mue state of given markings
+   * @param path path
+   */
   private void setOmega(Vector mue, List<Vector> path) {
     List<Place> places = petrinet.getPlaces();
     boolean[] omegas = new boolean[petrinet.getPlaces().size()];
@@ -123,7 +164,10 @@ public class CoverabilityGraph {
       omegaKand = new boolean[petrinet.getPlaces().size()];
     }
     for(int s = 0; s < places.size(); s++) {
-      if(omegas[s]) mue.setOmega(s);
+      if(omegas[s]) {
+        mue.setOmega(s);
+        places.get(s).setBoundedness(-1);
+      }
     }
   }
 
