@@ -5,8 +5,10 @@ import graph.Transition;
 import graph.Vector;
 import interfaces.AddNodes;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import graph.Node;
+import java.util.stream.Collectors;
 
 public class Petrinet implements AddNodes {
 
@@ -35,7 +37,9 @@ public class Petrinet implements AddNodes {
     this.places.add(place);
   }
 
-  public List<Place> getPlaces() { return places; }
+  public List<Place> getPlaces() {
+    return places;
+  }
 
   public void addTransition(Transition transition) {
     this.transitions.add(transition);
@@ -49,13 +53,15 @@ public class Petrinet implements AddNodes {
     flow.add(edge);
   }
 
-  public List<Edge> getFlow() { return flow; }
+  public List<Edge> getFlow() {
+    return flow;
+  }
 
   @Override
   public void addPlaceNodes(String[] split) throws NotExistingNodeException {
     Place place = new Place(split[0], places.size());
     this.addPlace(place);
-    if(split.length > 1) {
+    if (split.length > 1) {
       String[] toNodes = split[1].split(",");
       if (toNodes.length > 0) {
         for (String toNode : toNodes) {
@@ -89,16 +95,14 @@ public class Petrinet implements AddNodes {
       flow.forEach(edge -> {
         Node from = edge.getFrom();
         Node to = edge.getTo();
-        System.out.println(transitions);
-        System.out.println(transitions.indexOf(to));
         if (place.equals(to) && from.getClass() == Transition.class) {
-          arrPre[transitions.indexOf(from)] += 1;
+          arrPre[from.indexIn(transitions)] += 1;
         } else if (place.equals(from) && to.getClass() == Transition.class) {
-          arrPost[transitions.indexOf(to)] += 1;
+          arrPost[to.indexIn(transitions)] += 1;
         }
       });
-      place.setPreVector(new Vector(arrPre));
-      place.setPostVector(new Vector(arrPost));
+      place.setInput(new Vector(arrPre));
+      place.setOutput(new Vector(arrPost));
     });
     transitions.forEach(transition -> {
       int[] arrPre = new int[places.size()];
@@ -107,13 +111,13 @@ public class Petrinet implements AddNodes {
         Node from = edge.getFrom();
         Node to = edge.getTo();
         if (transition.equals(to) && from.getClass() == Place.class) {
-          arrPre[places.indexOf(from)] += 1;
+          arrPre[from.indexIn(places)] += 1;
         } else if (transition.equals(from) && to.getClass() == Place.class) {
-          arrPost[places.indexOf(to)] += 1;
+          arrPost[to.indexIn(places)] += 1;
         }
       });
-      transition.setPreVector(new Vector(arrPre));
-      transition.setPostVector(new Vector(arrPost));
+      transition.setInput(new Vector(arrPre));
+      transition.setOutput(new Vector(arrPost));
     });
   }
 
@@ -140,4 +144,14 @@ public class Petrinet implements AddNodes {
     out.append("}");
     return out.append("\n").toString();
   }
+
+  /**
+   * -1: dead; 0: not dead; 1: weak liveness; 2: alive
+   */
+  public int getLiveness() {
+    return Collections
+        .min(transitions.stream().map(Transition::getLiveness).collect(Collectors.toList()));
+  }
+
+  //TODO: structural liveness and deadlock-free
 }

@@ -1,42 +1,47 @@
 package graph;
 
-import exception.WrongDimensionException;
+import java.util.List;
 
-public class Node {
+public abstract class Node {
 
   protected String label;
-  protected Vector preVector, postVector;
+  protected Vector input, output;
 
   protected Node(String label) {
     this.label = label;
-    this.preVector = new Vector(0);
-    this.postVector = new Vector(0);
+    this.input = new Vector(0);
+    this.output = new Vector(0);
   }
 
   protected Node(String label, int size) {
     this.label = label;
-    this.preVector = new Vector(0);
-    this.postVector = new Vector(0);
+    this.input = new Vector(0);
+    this.output = new Vector(0);
   }
 
-  public void setPostVector(Vector postVector) {
-    this.postVector = postVector;
+  public void setOutput(Vector output) {
+    this.output = output;
   }
 
-  public void setPreVector(Vector preVector) {
-    this.preVector = preVector;
+  public void setInput(Vector input) {
+    this.input = input;
   }
 
-  public Vector getPreVector() { return preVector; }
+  public Vector getInput() { return input; }
 
-  public Vector getPostVector() { return postVector; }
+  public Vector getOutput() { return output; }
+
+  public int indexIn(List<? extends Node> list) {
+    for(int i = 0; i < list.size(); i++) {
+      if (list.get(i).equals(this)) return i;
+    }
+    return -1;
+  }
 
   @Override
   public String toString() {
     return label;
   }
 
-  public boolean equals(Node node) {
-    return label.equals(node.label);
-  }
+  public boolean equals(Node node) { return label.equals(node.label); }
 }

@@ -5,7 +5,6 @@ import graph.Place;
 import graph.Transition;
 import graph.Vector;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +51,7 @@ public class CoverabilityGraph {
 
   private Optional<Vector> fire(Vector mue, Transition transition) throws WrongDimensionException {
     // if: calculate post and pre vectors in method, else with vectors
-    if (transition.getPostVector().getLength() == 0 || transition.getPreVector().getLength() == 0) {
+    if (transition.getOutput().getLength() == 0 || transition.getInput().getLength() == 0) {
       Vector newMue = new Vector(mue.getLength());
       newMue.add(mue);
       if (petrinet.getTransitions().contains(transition)) {
@@ -81,6 +80,7 @@ public class CoverabilityGraph {
           int index = petrinet.getPlaces().indexOf(place);
           newMue.addAtIndex(index, 1);
         }
+        if(transition.isDead()) transition.setLiveness(0);
         return Optional.of(newMue);
       }
     } else {
