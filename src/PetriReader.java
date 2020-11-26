@@ -10,9 +10,7 @@ public class PetriReader {
   private static Petrinet petrinet;
 
   private static boolean humanReadable, printPetriNet, printCoverabilityGraph;
-  private static String filenameCG, filenamePN;
-
-  private static List<Vector> globalVisited;
+  private static String filenameCG, filenamePN, pnString, markingsString, covString;
 
   public static void main(String[] args) throws NotExistingNodeException {
     humanReadable = false;
@@ -20,54 +18,67 @@ public class PetriReader {
     printCoverabilityGraph = false;
     filenamePN = "petrinet.gv";
     filenameCG = "ueb.gv";
-    String pnString = "";
-    String markingsString = "";
+    pnString = "";
+    markingsString = "";
+    covString = "";
     for (String arg : args) {
-      if (arg.equals("-h") || arg.equals("--help")) {
-        printHelp();
-      } else if (arg.equals("-r") || arg.equals("--readable")) {
-        humanReadable = true;
-      } else if (arg.startsWith("--net")) {
-        filenamePN = arg.substring(5);
-        if (!filenamePN.substring(filenamePN.length() - 3).equals(".gv")) {
-          filenamePN += ".gv";
-        }
-      } else if (arg.startsWith("--cover")) {
-        filenameCG = arg.substring(5);
-        if (!filenameCG.substring(filenameCG.length() - 3).equals(".gv")) {
-          filenameCG += ".gv";
-        }
-      } else if (arg.equals("--printcover")) {
-        printPetriNet = false;
-        printCoverabilityGraph = true;
-      } else if (arg.equals("--printboth")) {
-        printCoverabilityGraph = true;
-      } else if (arg.startsWith("-p")) {
-        pnString = arg.substring(2);
-      } else if (arg.startsWith("-m")) {
-        markingsString = arg.substring(2);
-      }
+      readArguments(arg);
     }
     if (pnString.equals("") || markingsString.equals("")) {
       System.out.println(" Please add your pn-string or add -h for more help.");
       System.exit(0);
     }
     petrinet = new Petrinet(filenamePN.substring(0, filenamePN.length() - 3));
-
     readPnString(pnString, markingsString);
 
     // petrinet.setVectors();
     try {
       CoverabilityGraph coverabilityGraph = createCoverabilityGraph(petrinet, filenameCG);
-      if (printCoverabilityGraph) {
-        System.out.println(coverabilityGraph.toString());
-      }
+      covString = coverabilityGraph.toString();
     } catch (WrongDimensionException e) { e.printStackTrace(); }
-    //print graphs to commandline
-    if (printPetriNet) {
-      System.out.print(petrinet.toString());
-    }
 
+    //print graphs to commandline
+    if (printPetriNet) System.out.print(petrinet.toString());
+    if (printCoverabilityGraph) System.out.println(covString);
+  }
+
+  private static void readArguments(String arg) {
+    if (arg.equals("-h") || arg.equals("--help")) {
+      printHelp();
+    } else if (arg.equals("-r") || arg.equals("--readable")) {
+      humanReadable = true;
+    } else if (arg.startsWith("--net")) {
+      filenamePN = arg.substring(5);
+      if (!filenamePN.substring(filenamePN.length() - 3).equals(".gv")) {
+        filenamePN += ".gv";
+      }
+    } else if (arg.startsWith("--cover")) {
+      filenameCG = arg.substring(5);
+      if (!filenameCG.substring(filenameCG.length() - 3).equals(".gv")) {
+        filenameCG += ".gv";
+      }
+    } else if (arg.equals("--printcover")) {
+      printPetriNet = false;
+      printCoverabilityGraph = true;
+    } else if (arg.equals("--printboth")) {
+      printCoverabilityGraph = true;
+    } else if (arg.startsWith("-p")) {
+      pnString = arg.substring(2);
+    } else if (arg.startsWith("-m")) {
+      markingsString = arg.substring(2);
+    }
+  }
+
+  public static Petrinet createPetriNetAndMarkings(String pnString, String markingsString) {
+    Vector mue_0 = new Vector(markingsString.split(","));
+    Petrinet pNet = new Petrinet("petrinet");
+    String[] pnStringParts = pnString.split(";;");
+    Arrays.stream(pnStringParts[0].split(";")).map(x -> x.split(":"))
+        .forEach(pNet::addPlaceNodes);
+    Arrays.stream(pnStringParts[1].split(";")).map(x -> x.split(":"))
+        .forEach(pNet::addTransitionNodes);
+    pNet.setMue0(mue_0);
+    return pNet;
   }
 
   private static void readPnString(String pnString, String markingsString)
@@ -83,6 +94,7 @@ public class PetriReader {
 
   private static void printHelp() {
     System.out.println(" Input of a pn-string and a marking:");
+    //TODO: change to java
     System.out.println(
         " Call with: 'python pn_string_converter.py -p\"s1:t1,t2;s2:;;t1:s1;t2:s2;;\" -m\"3,0\"'");
     System.out.println(" To change the filename of the petrinet type e.g.: '--net\"petri_net\"'");
@@ -95,9 +107,8 @@ public class PetriReader {
     System.exit(0);
   }
 
-  private static CoverabilityGraph createCoverabilityGraph(Petrinet petrinet, String name)
+  public static CoverabilityGraph createCoverabilityGraph(Petrinet petrinet, String name)
       throws WrongDimensionException {
-    CoverabilityGraph ueb = new CoverabilityGraph(petrinet.getMue0(), name, petrinet);
-    return ueb;
+    return new CoverabilityGraph(petrinet.getMue0(), name, petrinet);
   }
 }
