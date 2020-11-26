@@ -113,6 +113,21 @@ public class Vector {
     }
   }
 
+
+  public boolean sub(Vector vector) {
+    if(this.length != vector.length) {
+      return false;
+    }
+    Vector temp = new Vector(vectorArray.clone());
+    for(int i = 0; i < length; i++) {
+      if(!temp.subAtIndex(i, vector.get(i))) {
+        return false;
+      }
+    }
+    this.vectorArray = temp.vectorArray;
+    return true;
+  }
+
   public boolean addAtIndex(int index, int value) {
     if(index < vectorArray.length) {
       if(vectorArray[index] != -1) {
@@ -130,7 +145,7 @@ public class Vector {
   public boolean subAtIndex(int index, int value) {
     if(index < vectorArray.length) {
       if(vectorArray[index] != -1) {
-        if(value < 0) {
+        if(value < 0 || vectorArray[index] < value) {
           return false;
         } else {
           vectorArray[index] -= value;

@@ -59,16 +59,13 @@ public class Petrinet implements AddNodes {
 
   @Override
   public void addPlaceNodes(String[] split) throws NotExistingNodeException {
-    Place place = new Place(split[0], places.size());
+    Place place = new Place(split[0]);
     this.addPlace(place);
     if (split.length > 1) {
       String[] toNodes = split[1].split(",");
       if (toNodes.length > 0) {
         for (String toNode : toNodes) {
           this.addEdge(new Edge<>(place, new Transition(toNode)));
-        /*this.addEdge(new Edge<>(place,
-            transitions.stream().filter(transition -> transition.toString().equals(toNode))
-                .findAny().orElseThrow(NotExistingNodeException::new)));*/
         }
       }
     }
@@ -88,39 +85,45 @@ public class Petrinet implements AddNodes {
     }
   }
 
+  /**
+   * Sets the start- and end- nodes for every node.
+   */
   public void setVectors() {
-    places.forEach(place -> {
-      int[] arrPre = new int[transitions.size()];
-      int[] arrPost = new int[transitions.size()];
-      flow.forEach(edge -> {
-        Node from = edge.getFrom();
-        Node to = edge.getTo();
-        if (place.equals(to) && from.getClass() == Transition.class) {
-          arrPre[from.indexIn(transitions)] += 1;
-        } else if (place.equals(from) && to.getClass() == Transition.class) {
-          arrPost[to.indexIn(transitions)] += 1;
-        }
-      });
-      place.setInput(new Vector(arrPre));
-      place.setOutput(new Vector(arrPost));
-    });
-    transitions.forEach(transition -> {
-      int[] arrPre = new int[places.size()];
-      int[] arrPost = new int[places.size()];
-      flow.forEach(edge -> {
-        Node from = edge.getFrom();
-        Node to = edge.getTo();
-        if (transition.equals(to) && from.getClass() == Place.class) {
-          arrPre[from.indexIn(places)] += 1;
-        } else if (transition.equals(from) && to.getClass() == Place.class) {
-          arrPost[to.indexIn(places)] += 1;
-        }
-      });
-      transition.setInput(new Vector(arrPre));
-      transition.setOutput(new Vector(arrPost));
-    });
+    new Thread(() ->
+        places.forEach(place -> {
+          int[] arrIn = new int[transitions.size()];
+          int[] arrOut = new int[transitions.size()];
+          flow.forEach(edge -> {
+            Node from = edge.getFrom();
+            Node to = edge.getTo();
+            if (place.equals(to) && from.getClass() == Transition.class) {
+              arrIn[from.indexIn(transitions)] += 1;
+            } else if (place.equals(from) && to.getClass() == Transition.class) {
+              arrOut[to.indexIn(transitions)] += 1;
+            }
+          });
+          place.setInput(new Vector(arrIn));
+          place.setOutput(new Vector(arrOut));
+        })).start();
+    new Thread(() ->
+        transitions.forEach(transition -> {
+          int[] arrIn = new int[places.size()];
+          int[] arrOut = new int[places.size()];
+          flow.forEach(edge -> {
+            Node from = edge.getFrom();
+            Node to = edge.getTo();
+            if (transition.equals(to) && from.getClass() == Place.class) {
+              arrIn[from.indexIn(places)] += 1;
+            } else if (transition.equals(from) && to.getClass() == Place.class) {
+              arrOut[to.indexIn(places)] += 1;
+            }
+          });
+          transition.setInput(new Vector(arrIn));
+          transition.setOutput(new Vector(arrOut));
+        })).start();
   }
 
+  @Override
   public String toString() {
     StringBuilder out = new StringBuilder(String
         .format("digraph %s{\nnode[shape=circle];\n", name));
@@ -154,4 +157,17 @@ public class Petrinet implements AddNodes {
   }
 
   //TODO: structural liveness and deadlock-free
+
+  public void setInitialBoundesness() {
+    for (int i = 0; i < places.size(); i++) {
+      places.get(i).setBoundedness(mue0.get(i));
+    }
+  }
+
+  public int getBoundedness() {
+    return places.stream().map(Place::getBoundedness).filter(bound -> bound == -1)
+        .findAny()
+        .orElse(Collections
+            .max(places.stream().map(Place::getBoundedness).collect(Collectors.toList())));
+  }
 }
