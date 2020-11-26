@@ -35,6 +35,8 @@ public class Petrinet implements AddNodes {
     this.places.add(place);
   }
 
+  public List<Place> getPlaces() { return places; }
+
   public void addTransition(Transition transition) {
     this.transitions.add(transition);
   }
@@ -46,6 +48,8 @@ public class Petrinet implements AddNodes {
   public void addEdge(Edge<? extends Node, ? extends Node> edge) {
     flow.add(edge);
   }
+
+  public List<Edge> getFlow() { return flow; }
 
   @Override
   public void addPlaceNodes(String[] split) throws NotExistingNodeException {

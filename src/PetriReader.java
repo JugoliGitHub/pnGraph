@@ -1,4 +1,5 @@
 import exception.NotExistingNodeException;
+import exception.WrongDimensionException;
 import graph.Vector;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,15 +57,17 @@ public class PetriReader {
     readPnString(pnString, markingsString);
 
     // petrinet.setVectors();
-    CoverabilityGraph coverabilityGraph = createCoverabilityGraph(petrinet, filenameCG);
-
+    try {
+      CoverabilityGraph coverabilityGraph = createCoverabilityGraph(petrinet, filenameCG);
+      if (printCoverabilityGraph) {
+        System.out.println(coverabilityGraph.toString());
+      }
+    } catch (WrongDimensionException e) { e.printStackTrace(); }
     //print graphs to commandline
     if (printPetriNet) {
       System.out.print(petrinet.toString());
     }
-    if (printCoverabilityGraph) {
-      System.out.println(coverabilityGraph.toString());
-    }
+
   }
 
   private static void readPnString(String pnString, String markingsString)
@@ -92,7 +95,8 @@ public class PetriReader {
     System.exit(0);
   }
 
-  private static CoverabilityGraph createCoverabilityGraph(Petrinet petrinet, String name) {
+  private static CoverabilityGraph createCoverabilityGraph(Petrinet petrinet, String name)
+      throws WrongDimensionException {
     CoverabilityGraph ueb = new CoverabilityGraph(petrinet.getMue0(), name, petrinet);
     return ueb;
   }

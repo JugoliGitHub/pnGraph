@@ -77,11 +77,11 @@ public class Vector {
    * @return true when this vector is less than the other
    */
   public boolean lessThan(Vector vector) {
-    if (length == vector.getLength() && this.equals(vector)) {
+    if (length == vector.getLength() && !this.equals(vector)) {
       for (int i = 0; i < length; i++) {
         int thisInt = this.vectorArray[i];
         int thatInt = vector.get(i);
-        if (thatInt != -1 && thisInt != -1 && thatInt > thisInt) {
+        if (thatInt != -1 && thisInt != -1 && thisInt > thatInt) {
           return false;
         }
       }
@@ -102,6 +102,8 @@ public class Vector {
           if(this.vectorArray[i] >= 0) {
             this.vectorArray[i] += vector.get(i);
           }
+        } else if(vector.get(i) == -1) {
+          this.vectorArray[i] = -1;
         } else {
           throw new IllegalArgumentException("Can´t add with omega or negative values.");
         }
@@ -109,6 +111,34 @@ public class Vector {
     } else {
       throw new WrongDimensionException("The Vectors must have the same dimension to add them.");
     }
+  }
+
+  public boolean addAtIndex(int index, int value) {
+    if(index < vectorArray.length) {
+      if(vectorArray[index] != -1) {
+        if(value < 0) {
+          return false;
+        } else {
+          vectorArray[index] += value;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  public boolean subAtIndex(int index, int value) {
+    if(index < vectorArray.length) {
+      if(vectorArray[index] != -1) {
+        if(value < 0) {
+          return false;
+        } else {
+          vectorArray[index] -= value;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
   public void setOmega(int index) {

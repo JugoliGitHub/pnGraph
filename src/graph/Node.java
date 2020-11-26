@@ -9,6 +9,8 @@ public class Node {
 
   protected Node(String label) {
     this.label = label;
+    this.preVector = new Vector(0);
+    this.postVector = new Vector(0);
   }
 
   protected Node(String label, int size) {

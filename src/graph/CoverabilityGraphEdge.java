@@ -14,6 +14,6 @@ public class CoverabilityGraphEdge {
   @Override
   public String toString() {
     return "  \"" + from.toString() + "\" -> \"" + to.toString() + "\" [label=\"" + transition
-        + ";\n";
+        + "\"];\n";
   }
 }
