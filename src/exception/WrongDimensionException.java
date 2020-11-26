@@ -1,6 +1,6 @@
 package exception;
 
-public class WrongDimensionException extends Exception {
+public class WrongDimensionException extends RuntimeException {
 
   public WrongDimensionException() {
     super();

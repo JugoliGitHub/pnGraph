@@ -1,10 +1,11 @@
 import exception.NotExistingNodeException;
 import exception.WrongDimensionException;
 import graph.Vector;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
+/**
+ * Class to read a Petrinet from the command line.
+ */
 public class PetriReader {
 
   private static Petrinet petrinet;
@@ -31,17 +32,22 @@ public class PetriReader {
     petrinet = new Petrinet(filenamePN.substring(0, filenamePN.length() - 3));
     readPnString(pnString, markingsString);
 
-    // petrinet.setVectors();
-    try {
-      CoverabilityGraph coverabilityGraph = createCoverabilityGraph(petrinet, filenameCG);
-      covString = coverabilityGraph.toString();
-    } catch (WrongDimensionException e) { e.printStackTrace(); }
+    CoverabilityGraph coverabilityGraph = new CoverabilityGraph(petrinet.getMue0(),
+        filenameCG.substring(0, filenameCG.length() - 3), petrinet);
+    covString = coverabilityGraph.toString();
 
     //print graphs to commandline
-    if (printPetriNet) System.out.print(petrinet.toString());
-    if (printCoverabilityGraph) System.out.println(covString);
+    if (printPetriNet) {
+      System.out.print(petrinet.toString());
+    }
+    if (printCoverabilityGraph) {
+      System.out.println(covString);
+    }
   }
 
+  /**
+   * Read configuration and data for the petri-net
+   */
   private static void readArguments(String arg) {
     if (arg.equals("-h") || arg.equals("--help")) {
       printHelp();
@@ -69,29 +75,49 @@ public class PetriReader {
     }
   }
 
+  /**
+   * Creates a petri-net with given Strings.
+   *
+   * @param pnString       string for the petri-net
+   * @param markingsString string for the initial mark
+   * @return the constructed petri-net
+   */
   public static Petrinet createPetriNetAndMarkings(String pnString, String markingsString) {
     Vector mue_0 = new Vector(markingsString.split(","));
     Petrinet pNet = new Petrinet("petrinet");
     String[] pnStringParts = pnString.split(";;");
-    Arrays.stream(pnStringParts[0].split(";")).map(x -> x.split(":"))
-        .forEach(pNet::addPlaceNodes);
-    Arrays.stream(pnStringParts[1].split(";")).map(x -> x.split(":"))
-        .forEach(pNet::addTransitionNodes);
-    pNet.setMue0(mue_0);
+    if (pnStringParts.length == 2) {
+      Arrays.stream(pnStringParts[0].split(";")).map(x -> x.split(":"))
+          .forEach(pNet::addPlaceNodes);
+      Arrays.stream(pnStringParts[1].split(";")).map(x -> x.split(":"))
+          .forEach(pNet::addTransitionNodes);
+    } else {
+      throw new IllegalArgumentException("The pn-string needs the right format.");
+    }
+    if (mue_0.getLength() == pNet.getPlaces().size()) {
+      pNet.setMue0(mue_0);
+      pNet.setVectors();
+      pNet.setInitialBoundesness();
+    } else {
+      throw new WrongDimensionException(
+          "The markings-string needs the same size as number of places in the petri-net.");
+    }
     return pNet;
   }
 
-  private static void readPnString(String pnString, String markingsString)
-      throws NotExistingNodeException {
-    Vector mue_0 = new Vector(markingsString.split(","));
-    String[] pnStringParts = pnString.split(";;");
-    Arrays.stream(pnStringParts[0].split(";")).map(x -> x.split(":"))
-        .forEach(petrinet::addPlaceNodes);
-    Arrays.stream(pnStringParts[1].split(";")).map(x -> x.split(":"))
-        .forEach(petrinet::addTransitionNodes);
-    petrinet.setMue0(mue_0);
+  /**
+   * Sets a constructed petri-net as the global net.
+   *
+   * @param pnString       string for the petri-net
+   * @param markingsString string for the initial mark
+   */
+  private static void readPnString(String pnString, String markingsString) {
+    petrinet = createPetriNetAndMarkings(pnString, markingsString);
   }
 
+  /**
+   * Prints a help string to the command-line.
+   */
   private static void printHelp() {
     System.out.println(" Input of a pn-string and a marking:");
     //TODO: change to java
@@ -107,8 +133,4 @@ public class PetriReader {
     System.exit(0);
   }
 
-  public static CoverabilityGraph createCoverabilityGraph(Petrinet petrinet, String name)
-      throws WrongDimensionException {
-    return new CoverabilityGraph(petrinet.getMue0(), name, petrinet);
-  }
 }
