@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/** A class to create coverability-graphs for a petri-net */
+/**
+ * A class to create coverability-graphs for a petri-net
+ */
 public class CoverabilityGraph {
 
   private Petrinet petrinet;
@@ -20,7 +22,9 @@ public class CoverabilityGraph {
 
   private List<Vector> visited;
 
-  /** Constructor */
+  /**
+   * Constructor
+   */
   public CoverabilityGraph(Vector mue0, String name, Petrinet petrinet)
       throws WrongDimensionException {
     this.name = name;
@@ -34,10 +38,12 @@ public class CoverabilityGraph {
     ArrayList<Vector> path = new ArrayList<>();
     path.add(mue0);
     go(mue0, path);
+    petrinet.getTransitions().forEach(this::setLiveness);
   }
 
   /**
    * Adds a vector to the list markings, when it is not already present.
+   *
    * @param mark marking that will be added if not present.
    * @return false when present
    */
@@ -48,6 +54,7 @@ public class CoverabilityGraph {
 
   /**
    * Adds a edge to the list knots, when it is not already present.
+   *
    * @param edge edge that will be added if not present
    * @return false when present
    */
@@ -59,6 +66,7 @@ public class CoverabilityGraph {
 
   /**
    * Adds a vector to the list of visited mues, when it is not already visited.
+   *
    * @param newVector the new mue
    * @return false when visited
    */
@@ -71,7 +79,8 @@ public class CoverabilityGraph {
    * Fires a transition with a given mue, when possible. This method will create own front and end
    * places if necessary. When the transition has them it will calculate the following state with
    * them.
-   * @param mue current state of markings
+   *
+   * @param mue        current state of markings
    * @param transition transition to be fired
    * @return An Optional which is empty, when the transition could not be fired
    * @throws WrongDimensionException when the vector has a different dimension
@@ -107,21 +116,27 @@ public class CoverabilityGraph {
           int index = petrinet.getPlaces().indexOf(place);
           int newValueOfPlace = newMue.get(index);
           newMue.addAtIndex(index, 1);
-          if(place.getBoundedness() < newValueOfPlace) place.setBoundedness(newValueOfPlace);
+          if (place.getBoundedness() < newValueOfPlace) {
+            place.setBoundedness(newValueOfPlace);
+          }
         }
       }
-    } else if(newMue.sub(transition.getInput())) {
+    }
+    else if (newMue.sub(transition.getInput())) {
       newMue.add(transition.getOutput());
     } else {
       return Optional.empty();
     }
-    if(transition.isDead()) transition.setLiveness(0);
+    if (transition.isDead()) {
+      transition.setLiveness(0);
+    }
     return Optional.of(newMue);
   }
 
   /**
    * Implementation of 'laufe' from Algorithm 1: uebGraph.
-   * @param mue given state of markings
+   *
+   * @param mue  given state of markings
    * @param path path
    * @throws WrongDimensionException when the vector has a different dimension
    */
@@ -130,8 +145,12 @@ public class CoverabilityGraph {
       Optional<Vector> newMueOptional = fire(mue, transition);
       if (newMueOptional.isPresent()) {
         Vector newMue = newMueOptional.get();
-        setOmega(newMue, path);
+        newMue = setOmega(newMue, path);
+        if (newMue.containsOmega()) {
+          transition.setLiveness(1);
+        }
         addToMarkings(newMue);
+        System.out.println(markings);
         addToKnots(new CoverabilityGraphEdge(mue, transition, newMue));
         if (addToVisited(newMue)) {
           path.add(newMue);
@@ -144,37 +163,76 @@ public class CoverabilityGraph {
 
   /**
    * Implementation of 'setzeOmega' from Algorithm 1: uebGraph
-   * @param mue state of given markings
+   *
+   * @param mue  state of given markings
    * @param path path
    */
-  private void setOmega(Vector mue, List<Vector> path) {
+  private Vector setOmega(Vector mue, List<Vector> path) {
     List<Place> places = petrinet.getPlaces();
     boolean[] omegas = new boolean[petrinet.getPlaces().size()];
     boolean[] omegaKand = new boolean[petrinet.getPlaces().size()];
-    for(int i = path.size() - 1; i >= 0; i--) {
+    for (int i = path.size() - 1; i >= 0; i--) {
       Vector knot = path.get(i);
-      if(knot.lessThan(mue)) {
-        for(int s = 0; s < places.size(); s++) {
-          if(knot.get(s) < mue.get(s) && mue.get(s) != -1) omegaKand[s] = true;
+      if (knot.lessThan(mue)) {
+        for (int s = 0; s < places.size(); s++) {
+          if (knot.get(s) < mue.get(s) && mue.get(s) != -1) {
+            omegaKand[s] = true;
+          }
         }
       }
-      for(int s = 0; s < places.size(); s++){
-        if(omegaKand[s]) omegas[s] = true;
+      for (int s = 0; s < places.size(); s++) {
+        if (omegaKand[s]) {
+          omegas[s] = true;
+        }
       }
       omegaKand = new boolean[petrinet.getPlaces().size()];
     }
-    for(int s = 0; s < places.size(); s++) {
-      if(omegas[s]) {
+    for (int s = 0; s < places.size(); s++) {
+      if (omegas[s]) {
         mue.setOmega(s);
         places.get(s).setBoundedness(-1);
       }
+    }
+    return mue;
+  }
+
+  private void setLiveness(Transition t) {
+    //TODO: when is alive?
+    if (false) {
+      t.setLiveness(2);
+    } else if (knots.stream().filter(k -> k.getTransition() == t).allMatch(this::findLoop)) {
+      t.setLiveness(1);
+    } else if (knots.stream().anyMatch(k -> k.getTransition() == t)) {
+      t.setLiveness(0);
+    } else {
+      t.setLiveness(-1);
+    }
+  }
+
+  private boolean findLoop(CoverabilityGraphEdge edge) {
+    return knots.stream().filter(edge2 -> edge2.getFrom().equals(edge.getTo()))
+        .map(knot -> findLoopRecursive(edge.getFrom(), new ArrayList<>(), knot)).findFirst()
+        .isPresent();
+  }
+
+  private boolean findLoopRecursive(Vector from, List<Vector> visitedVectors,
+      CoverabilityGraphEdge edge) {
+    Vector edgeTo = edge.getTo();
+    if (edgeTo.equals(from)) {
+      return true;
+    } else if (visitedVectors.contains(edgeTo)) {
+      return false;
+    } else {
+      visitedVectors.add(edgeTo);
+      return knots.stream().filter(edge2 -> edge2.getFrom().equals(edgeTo))
+          .map(knot -> findLoopRecursive(from, visitedVectors, knot)).findFirst().isPresent();
     }
   }
 
   @Override
   public String toString() {
     StringBuilder out = new StringBuilder(
-        "digraph " + name + "{\nrankdir=\"LR\";\nnode[shape=plaintext];\n");
+        "digraph " + name + "{\n  rankdir=\"LR\";\n  node[shape=plaintext];\n");
     knots.forEach(edge -> out.append(edge.toString()));
     out.append("}\n");
     return out.append("\n").toString();
