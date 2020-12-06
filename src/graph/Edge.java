@@ -1,5 +1,7 @@
 package graph;
 
+import java.util.Objects;
+
 public class Edge<K extends Node, V extends Node> {
 
   private final K from;
@@ -22,4 +24,5 @@ public class Edge<K extends Node, V extends Node> {
   public String toString() {
     return "  \"" + from.toString() + "\" -> \"" + to.toString() + "\";\n";
   }
+
 }

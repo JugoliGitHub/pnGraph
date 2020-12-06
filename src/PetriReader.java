@@ -97,7 +97,7 @@ public class PetriReader {
     if (mue_0.getLength() == pNet.getPlaces().size()) {
       pNet.setMue0(mue_0);
       pNet.setVectors();
-      pNet.setInitialBoundesness();
+      pNet.setInitialBoundedness();
     } else {
       throw new WrongDimensionException(
           "The markings-string needs the same size as number of places in the petri-net.");

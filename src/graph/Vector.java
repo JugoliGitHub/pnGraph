@@ -2,6 +2,8 @@ package graph;
 
 import java.util.Arrays;
 import exception.WrongDimensionException;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class Vector {
@@ -60,6 +62,10 @@ public class Vector {
     return vectorArray;
   }
 
+  public boolean containsOmega() {
+    return Arrays.stream(vectorArray).anyMatch(i -> i == -1);
+  }
+
   /**
    * Compares whether another vector equals this.
    *
@@ -98,6 +104,7 @@ public class Vector {
   public void add(Vector vector) throws WrongDimensionException {
     if (vector.length == length) {
       for (int i = 0; i < length; i++) {
+        if(this.vectorArray[i] == -1) continue;
         if (vector.get(i) >= 0) {
           if(this.vectorArray[i] >= 0) {
             this.vectorArray[i] += vector.get(i);
@@ -157,7 +164,7 @@ public class Vector {
   }
 
   public void setOmega(int index) {
-    if(index > 0 && index < length) {
+    if(index >= 0 && index < length) {
       vectorArray[index] = -1;
     }
   }

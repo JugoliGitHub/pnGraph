@@ -75,12 +75,13 @@ public class Petrinet implements AddNodes {
   public void addTransitionNodes(String[] split) throws NotExistingNodeException {
     Transition transition = new Transition(split[0]);
     this.addTransition(transition);
-    String[] toNodes = split[1].split(",");
-    if (toNodes.length > 0) {
+    if (split.length > 1) {
+      String[] toNodes = split[1].split(",");
       for (String toNode : toNodes) {
         this.addEdge(new Edge<>(transition,
-            places.stream().filter(place -> place.toString().equals(toNode)).findAny().orElseThrow(
-                NotExistingNodeException::new)));
+            places.stream().filter(place -> place.toString().equals(toNode)).findAny()
+                .orElseThrow(
+                    NotExistingNodeException::new)));
       }
     }
   }
@@ -149,7 +150,9 @@ public class Petrinet implements AddNodes {
   }
 
   /**
-   * -1: dead; 0: not dead; 1: weak liveness; 2: alive
+   * Returns the Liveness of the petri-net.
+   *
+   * @return -1: dead; 0: not dead; 1: weak liveness; 2: alive
    */
   public int getLiveness() {
     return Collections
@@ -158,12 +161,19 @@ public class Petrinet implements AddNodes {
 
   //TODO: structural liveness and deadlock-free
 
-  public void setInitialBoundesness() {
+  /**
+   * Initializes every node with the boundedness of the initial marking mue_0.
+   */
+  public void setInitialBoundedness() {
     for (int i = 0; i < places.size(); i++) {
       places.get(i).setBoundedness(mue0.get(i));
     }
   }
 
+  /**
+   * Returns the maximal value of a bounded place.
+   * @return -1 for unbounded (omega), k as the maximal bound
+   */
   public int getBoundedness() {
     return places.stream().map(Place::getBoundedness).filter(bound -> bound == -1)
         .findAny()
