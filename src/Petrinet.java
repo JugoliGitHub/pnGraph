@@ -4,14 +4,13 @@ import graph.Edge;
 import graph.Place;
 import graph.Transition;
 import graph.Vector;
-import interfaces.AddNodes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import graph.Node;
 import java.util.stream.Collectors;
 
-public class Petrinet implements AddNodes {
+public class Petrinet {
 
   private final String name;
   private final List<Place> places;
@@ -70,7 +69,11 @@ public class Petrinet implements AddNodes {
 
   public Vector getCapacity() { return capacity; }
 
-  @Override
+  /**
+   * Adds place nodes to the petrinet.
+   * @param split split of transition part of pn-string
+   * @throws NotExistingNodeException throws a runtime exception, in case the node does not exist
+   */
   public void addPlaceNodes(String[] split) throws NotExistingNodeException {
     Place place = new Place(split[0]);
     this.addPlace(place);
@@ -84,7 +87,11 @@ public class Petrinet implements AddNodes {
     }
   }
 
-  @Override
+  /**
+   * Adds transition nodes to the petrinet.
+   * @param split split of place part of pn-string.
+   * @throws NotExistingNodeException throws a runtime exception, in case the node does not exist
+   */
   public void addTransitionNodes(String[] split) throws NotExistingNodeException {
     Transition transition = new Transition(split[0]);
     this.addTransition(transition);
