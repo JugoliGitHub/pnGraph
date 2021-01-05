@@ -108,7 +108,8 @@ public class Vector {
    * @return true when this vector is less than the other
    */
   public boolean lessEquals(Vector vector) {
-    if (length == vector.getLength() && !this.equals(vector)) {
+    if (length == vector.getLength()) {
+      if (this.equals(vector)) return true;
       for (int i = 0; i < length; i++) {
         int thisInt = this.vectorArray[i];
         int thatInt = vector.get(i);
