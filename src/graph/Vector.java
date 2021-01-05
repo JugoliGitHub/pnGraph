@@ -2,8 +2,6 @@ package graph;
 
 import java.util.Arrays;
 import exception.WrongDimensionException;
-import java.util.Collections;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class Vector {
@@ -17,6 +15,13 @@ public class Vector {
   public Vector(int length) {
     this.length = length;
     vectorArray = new int[length];
+  }
+
+  public Vector(int length, int value) {
+    this(length);
+    for(int i = 0; i < length; i++) {
+      this.vectorArray[i] = value;
+    }
   }
 
   public Vector(int[] array) {
@@ -79,10 +84,30 @@ public class Vector {
   /**
    * Compares this vector to the given parameter.
    *
-   * @param vector to compare with
+   * @param vector to compare to
    * @return true when this vector is less than the other
    */
   public boolean lessThan(Vector vector) {
+    if (length == vector.getLength() && !this.equals(vector)) {
+      for (int i = 0; i < length; i++) {
+        int thisInt = this.vectorArray[i];
+        int thatInt = vector.get(i);
+        if (thatInt != -1 && thisInt != -1 && thisInt >= thatInt) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Compares this vector to the given parameter.
+   *
+   * @param vector to compare to
+   * @return true when this vector is less than the other
+   */
+  public boolean lessEquals(Vector vector) {
     if (length == vector.getLength() && !this.equals(vector)) {
       for (int i = 0; i < length; i++) {
         int thisInt = this.vectorArray[i];
@@ -97,42 +122,47 @@ public class Vector {
   }
 
   /**
-   * Adds a vector to this vector.
+   * Returns the sum of this vector with another.
    *
    * @param vector additional vector
    */
-  public void add(Vector vector) throws WrongDimensionException {
+  public Vector add(Vector vector) throws WrongDimensionException {
     if (vector.length == length) {
+      Vector temp = new Vector(vectorArray.clone());
       for (int i = 0; i < length; i++) {
-        if(this.vectorArray[i] == -1) continue;
+        if(temp.vectorArray[i] == -1) continue;
         if (vector.get(i) >= 0) {
-          if(this.vectorArray[i] >= 0) {
-            this.vectorArray[i] += vector.get(i);
+          if(temp.vectorArray[i] >= 0) {
+            temp.vectorArray[i] += vector.get(i);
           }
         } else if(vector.get(i) == -1) {
-          this.vectorArray[i] = -1;
+          temp.vectorArray[i] = -1;
         } else {
           throw new IllegalArgumentException("Can´t add with omega or negative values.");
         }
       }
+      return temp;
     } else {
       throw new WrongDimensionException("The Vectors must have the same dimension to add them.");
     }
   }
 
-
-  public boolean sub(Vector vector) {
+  /**
+   *
+   * @param vector
+   * @return the difference or an empty vector if it did not work
+   */
+  public Vector sub(Vector vector) {
     if(this.length != vector.length) {
-      return false;
+      return new Vector(0);
     }
     Vector temp = new Vector(vectorArray.clone());
     for(int i = 0; i < length; i++) {
       if(!temp.subAtIndex(i, vector.get(i))) {
-        return false;
+        return new Vector(0);
       }
     }
-    this.vectorArray = temp.vectorArray;
-    return true;
+    return temp;
   }
 
   public boolean addAtIndex(int index, int value) {

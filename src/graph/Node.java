@@ -44,4 +44,5 @@ public abstract class Node {
   }
 
   public boolean equals(Node node) { return label.equals(node.label); }
+
 }

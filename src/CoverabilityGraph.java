@@ -13,14 +13,14 @@ import java.util.Optional;
  */
 public class CoverabilityGraph {
 
-  private Petrinet petrinet;
+  protected Petrinet petrinet;
 
-  private String name;
-  private Vector mue0;
-  private List<Vector> markings;
-  private List<CoverabilityGraphEdge> knots;
+  protected String name;
+  protected Vector mue0;
+  protected List<Vector> markings;
+  protected List<CoverabilityGraphEdge> knots;
 
-  private List<Vector> visited;
+  protected List<Vector> visited;
 
   /**
    * Constructor
@@ -39,6 +39,16 @@ public class CoverabilityGraph {
     path.add(mue0);
     go(mue0, path);
     petrinet.getTransitions().forEach(this::setLiveness);
+  }
+
+  protected CoverabilityGraph(Vector mue0, String name) {
+    this.name = name;
+    this.mue0 = mue0;
+    this.markings = new ArrayList<>();
+    this.knots = new ArrayList<>();
+    markings.add(this.mue0);
+
+    this.visited = new ArrayList<>();
   }
 
   /**
@@ -85,9 +95,9 @@ public class CoverabilityGraph {
    * @return An Optional which is empty, when the transition could not be fired
    * @throws WrongDimensionException when the vector has a different dimension
    */
-  private Optional<Vector> fire(Vector mue, Transition transition) throws WrongDimensionException {
+  protected Optional<Vector> fire(Vector mue, Transition transition) throws WrongDimensionException {
     Vector newMue = new Vector(mue.getLength());
-    newMue.add(mue);
+    newMue = newMue.add(mue);
     if (transition.getOutput().getLength() == 0 || transition.getInput().getLength() == 0) {
       if (petrinet.getTransitions().contains(transition)) {
         List<Place> front_places = new ArrayList<>();
@@ -121,9 +131,9 @@ public class CoverabilityGraph {
           }
         }
       }
-    }
-    else if (newMue.sub(transition.getInput())) {
-      newMue.add(transition.getOutput());
+    } else if (!newMue.sub(transition.getInput()).equals(new Vector(0))) {
+      newMue = newMue.sub(transition.getInput()).add(transition.getOutput());
+      setBoundednessOfPlaces(mue, newMue);
     } else {
       return Optional.empty();
     }
@@ -140,7 +150,7 @@ public class CoverabilityGraph {
    * @param path path
    * @throws WrongDimensionException when the vector has a different dimension
    */
-  private void go(Vector mue, List<Vector> path) throws WrongDimensionException {
+  protected void go(Vector mue, List<Vector> path) throws WrongDimensionException {
     for (Transition transition : petrinet.getTransitions()) {
       Optional<Vector> newMueOptional = fire(mue, transition);
       if (newMueOptional.isPresent()) {
@@ -150,7 +160,6 @@ public class CoverabilityGraph {
           transition.setLiveness(1);
         }
         addToMarkings(newMue);
-        System.out.println(markings);
         addToKnots(new CoverabilityGraphEdge(mue, transition, newMue));
         if (addToVisited(newMue)) {
           path.add(newMue);
@@ -196,11 +205,11 @@ public class CoverabilityGraph {
     return mue;
   }
 
-  private void setLiveness(Transition t) {
+  protected void setLiveness(Transition t) {
     //TODO: when is alive?
-    if (false) {
+    if (knots.stream().filter(k -> k.getTransition() == t).allMatch(this::findLoop)) {
       t.setLiveness(2);
-    } else if (knots.stream().filter(k -> k.getTransition() == t).allMatch(this::findLoop)) {
+    } else if (knots.stream().filter(k -> k.getTransition() == t).anyMatch(this::findLoop)) {
       t.setLiveness(1);
     } else if (knots.stream().anyMatch(k -> k.getTransition() == t)) {
       t.setLiveness(0);
@@ -226,6 +235,18 @@ public class CoverabilityGraph {
       visitedVectors.add(edgeTo);
       return knots.stream().filter(edge2 -> edge2.getFrom().equals(edgeTo))
           .map(knot -> findLoopRecursive(from, visitedVectors, knot)).findFirst().isPresent();
+    }
+  }
+
+  protected void setBoundednessOfPlaces(Vector mue, Vector newMue) {
+    if (!newMue.equals(mue)) {
+      for (int i = 0; i < newMue.getLength(); i++) {
+        if (petrinet.getPlaces().get(i).getBoundedness() == -1 || newMue.get(i) == -1) {
+          petrinet.getPlaces().get(i).setBoundedness(-1);
+        } else if (petrinet.getPlaces().get(i).getBoundedness() < newMue.get(i)) {
+          petrinet.getPlaces().get(i).setBoundedness(newMue.get(i));
+        }
+      }
     }
   }
 

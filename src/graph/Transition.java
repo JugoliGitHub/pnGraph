@@ -5,9 +5,10 @@ public class Transition extends Node {
   // -1: dead; 0: not dead; 1: weak liveness; 2: alive
   int liveness;
 
+
   /**
    * Constructor of a transition.
-   * @param label
+   * @param label label of the transition
    */
   public Transition(String label) {
     super(label);
@@ -32,28 +33,12 @@ public class Transition extends Node {
    */
   public int getLiveness() { return liveness; }
 
-  /**
-   * Getter of dead.
-   * @return true if transition is dead
-   */
   public boolean isDead() { return liveness == -1; }
 
-  /**
-   * Getter of not dead.
-   * @return true if transition is not dead
-   */
   public boolean isNotDead() { return liveness >= 0; }
 
-  /**
-   * Getter of weak alive.
-   * @return true if transition is weak alive
-   */
   public boolean isWeakAlive() { return liveness >= 1; }
 
-  /**
-   * Getter of liveness.
-   * @return true if transition is alive.
-   */
   public boolean isAlive() { return liveness == 2; }
 
 }

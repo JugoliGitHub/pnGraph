@@ -1,7 +1,10 @@
 import exception.NotExistingNodeException;
 import exception.WrongDimensionException;
+import graph.Place;
 import graph.Vector;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Class to read a Petrinet from the command line.
@@ -46,7 +49,7 @@ public class PetriReader {
   }
 
   /**
-   * Read configuration and data for the petri-net
+   * Read configuration and data for the petri-net.
    */
   private static void readArguments(String arg) {
     if (arg.equals("-h") || arg.equals("--help")) {
@@ -76,7 +79,7 @@ public class PetriReader {
   }
 
   /**
-   * Creates a petri-net with given Strings.
+   * Creates a petrinet with given strings, when strings are correct.
    *
    * @param pnString       string for the petri-net
    * @param markingsString string for the initial mark
@@ -100,7 +103,31 @@ public class PetriReader {
       pNet.setInitialBoundedness();
     } else {
       throw new WrongDimensionException(
-          "The markings-string needs the same size as number of places in the petri-net.");
+          "The markings-string needs the same size as number of places in the petrinet.");
+    }
+    return pNet;
+  }
+
+  /**
+   * Creates a petri-net with given Strings.
+   *
+   * @param pnString       string for the petri-net
+   * @param markingsString string for the initial mark
+   * @param capacity       vector with capacity of each place
+   * @return the constructed petri-net
+   */
+  public static Petrinet createPetriNetAndMarkings(String pnString, String markingsString,
+      Vector capacity) {
+    Petrinet pNet = createPetriNetAndMarkings(pnString, markingsString);
+    pNet.setCapacity(capacity);
+    List<Place> places = pNet.getPlaces();
+    if (capacity.getLength() == places.size()) {
+      for (int i = 0; i < capacity.getLength(); i++) {
+        places.get(i).setCapacity(capacity.get(i));
+      }
+    } else {
+      throw new WrongDimensionException(
+          "The capacity needs to be the same size as number of places in the petri-net.");
     }
     return pNet;
   }

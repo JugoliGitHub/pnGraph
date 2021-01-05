@@ -1,4 +1,5 @@
 import exception.NotExistingNodeException;
+import exception.OutOfCapacityException;
 import graph.Edge;
 import graph.Place;
 import graph.Transition;
@@ -12,17 +13,25 @@ import java.util.stream.Collectors;
 
 public class Petrinet implements AddNodes {
 
-  private String name;
-  private List<Place> places;
-  private List<Transition> transitions;
-  private List<Edge> flow;
+  private final String name;
+  private final List<Place> places;
+  private final List<Transition> transitions;
+  private final List<Edge> flow;
   private Vector mue0;
+  private Vector capacity;
 
+  /**
+   * Constructor of a Petrinet. Creates an empty petrinet.
+   * Should initialize mue_0, capacity (if present) and places, transitions and flow.
+   * @param name name of the net
+   */
   public Petrinet(String name) {
     this.name = name;
     this.places = new ArrayList<>();
     this.transitions = new ArrayList<>();
     this.flow = new ArrayList<>();
+    this.mue0 = new Vector(0);
+    this.capacity = new Vector(0);
   }
 
   public void setMue0(Vector m0) {
@@ -57,6 +66,10 @@ public class Petrinet implements AddNodes {
     return flow;
   }
 
+  public void setCapacity(Vector c) { this.capacity = c; }
+
+  public Vector getCapacity() { return capacity; }
+
   @Override
   public void addPlaceNodes(String[] split) throws NotExistingNodeException {
     Place place = new Place(split[0]);
@@ -87,7 +100,7 @@ public class Petrinet implements AddNodes {
   }
 
   /**
-   * Sets the start- and end- nodes for every node.
+   * Sets the start- and end-nodes for every node.
    */
   public void setVectors() {
     new Thread(() ->
@@ -165,8 +178,16 @@ public class Petrinet implements AddNodes {
    * Initializes every node with the boundedness of the initial marking mue_0.
    */
   public void setInitialBoundedness() {
-    for (int i = 0; i < places.size(); i++) {
-      places.get(i).setBoundedness(mue0.get(i));
+    if (!capacity.equals(new Vector(0))) {
+      for (int i = 0; i < places.size(); i++) {
+        if (mue0.get(i) > capacity.get(i)) throw new OutOfCapacityException("The start marking has "
+            + "to be less-equal than the capacity");
+        places.get(i).setBoundedness(mue0.get(i));
+      }
+    } else {
+      for (int i = 0; i < places.size(); i++) {
+        places.get(i).setBoundedness(mue0.get(i));
+      }
     }
   }
 
@@ -180,4 +201,5 @@ public class Petrinet implements AddNodes {
         .orElse(Collections
             .max(places.stream().map(Place::getBoundedness).collect(Collectors.toList())));
   }
+
 }
