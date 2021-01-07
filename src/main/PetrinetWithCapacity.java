@@ -29,6 +29,12 @@ public class PetrinetWithCapacity extends Petrinet {
     return capacity;
   }
 
+  @Override
+  protected void setInitialBoundedness() {
+    for (int i = 0; i < places.size(); i++) {
+      places.get(i).setBoundedness(capacity.get(i));
+    }
+  }
 
   /*for (int i = 0; i < places.size(); i++) {
     if (mue0.get(i) > capacity.get(i)) {
