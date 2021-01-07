@@ -19,10 +19,14 @@ public class Petrinet {
   private final List<Transition> transitions;
   private final List<Edge> flow;
   private Vector mue0;
+
+  //TODO: auslagern in PnWithCapacity
+  // pn -> pn with capacity -> b/e system
+  // be system ohne schlingen und mehrfachkanten
   private Vector capacity;
 
   /**
-   * Constructor of a petrinet. Creates an empty petrinet. Should initialize mue_0, capacity (if
+   * Creates an empty petrinet. Should initialize mue_0, capacity (if
    * present) and places, transitions and flow.
    *
    * @param name name of the net
