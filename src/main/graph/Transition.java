@@ -1,5 +1,7 @@
 package main.graph;
 
+import java.util.List;
+
 public class Transition extends Node {
 
   // -1: dead; 0: not dead; 1: weak liveness; 2: alive
@@ -13,6 +15,23 @@ public class Transition extends Node {
   public Transition(String label) {
     super(label);
     liveness = 0;
+  }
+
+  @Override
+  public void setVectors(List<Edge> flow, List<? extends Node> places, int dimension) {
+    int[] arrIn = new int[dimension];
+    int[] arrOut = new int[dimension];
+    flow.forEach(edge -> {
+      Node from = edge.getFrom();
+      Node to = edge.getTo();
+      if (this.equals(to) && from.getClass() == Place.class) {
+        arrIn[from.indexIn(places)] += 1;
+      } else if (this.equals(from) && to.getClass() == Place.class) {
+        arrOut[to.indexIn(places)] += 1;
+      }
+    });
+    this.setInput(new Vector(arrIn));
+    this.setOutput(new Vector(arrOut));
   }
 
   /**

@@ -1,5 +1,7 @@
 package main.graph;
 
+import java.util.List;
+
 public class Place extends Node {
 
   // -1: not bounded; 0: undef; k: k-bounded
@@ -16,6 +18,23 @@ public class Place extends Node {
     super(label);
     this.boundedness = 0;
     this.capacity = capacity;
+  }
+
+  @Override
+  public void setVectors(List<Edge> flow, List<? extends Node> transitions, int dimension) {
+      int[] arrIn = new int[dimension];
+      int[] arrOut = new int[dimension];
+      flow.forEach(edge -> {
+        Node from = edge.getFrom();
+        Node to = edge.getTo();
+        if (this.equals(to) && from.getClass() == Transition.class) {
+          arrIn[from.indexIn(transitions)] += 1;
+        } else if (this.equals(from) && to.getClass() == Transition.class) {
+          arrOut[to.indexIn(transitions)] += 1;
+        }
+      });
+      this.setInput(new Vector(arrIn));
+      this.setOutput(new Vector(arrOut));
   }
 
   public void incrementBoundedness() {

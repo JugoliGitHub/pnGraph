@@ -15,8 +15,8 @@ public abstract class Node {
 
   protected Node(String label, int size) {
     this.label = label;
-    this.input = new Vector(0);
-    this.output = new Vector(0);
+    this.input = new Vector(size);
+    this.output = new Vector(size);
   }
 
   public void setOutput(Vector output) {
@@ -26,6 +26,15 @@ public abstract class Node {
   public void setInput(Vector input) {
     this.input = input;
   }
+
+  /**
+   * TODO: add description
+   *
+   * @param flow
+   * @param otherNodes
+   * @param dimension
+   */
+  public abstract void setVectors(List<Edge> flow, List<? extends Node> otherNodes, int dimension);
 
   public Vector getInput() { return input; }
 

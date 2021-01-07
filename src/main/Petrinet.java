@@ -12,12 +12,11 @@ import main.graph.Vector;
 
 public class Petrinet {
 
-  private final String name;
-  private final List<Place> places;
-  private final List<Transition> transitions;
-  private final List<Edge> flow;
-  private final Vector mue0;
-
+  protected final String name;
+  protected final List<Place> places;
+  protected final List<Transition> transitions;
+  protected final List<Edge> flow;
+  protected final Vector mue0;
 
   /**
    * Creates an empty petrinet. Should initialize mue_0, capacity (if present) and places,
@@ -37,24 +36,26 @@ public class Petrinet {
     setInitialBoundedness();
   }
 
+  /***********************/
+  /** Getter and Setter **/
+  /***********************/
   public Vector getMue0() {
     return this.mue0;
   }
 
   public void addPlace(Place place) {
     //TODO: change vector mue 0
-    //TODO new Petrinet with an extra place
+    //TODO  return new Petrinet with an extra place
     this.places.add(place);
   }
 
-  /***********************/
-  /** Getter and Setter **/
-  /***********************/
   public List<Place> getPlaces() {
     return places;
   }
 
-  public void addTransition(Transition transition) { this.transitions.add(transition); }
+  public void addTransition(Transition transition) {
+    this.transitions.add(transition);
+  }
 
   public List<Transition> getTransitions() {
     return transitions;
@@ -71,39 +72,12 @@ public class Petrinet {
   /**
    * Sets the start- and end-nodes for every node.
    */
-  protected void setVectors() {
+  private void setVectors() {
     new Thread(() ->
-        places.forEach(place -> {
-          int[] arrIn = new int[transitions.size()];
-          int[] arrOut = new int[transitions.size()];
-          flow.forEach(edge -> {
-            Node from = edge.getFrom();
-            Node to = edge.getTo();
-            if (place.equals(to) && from.getClass() == Transition.class) {
-              arrIn[from.indexIn(transitions)] += 1;
-            } else if (place.equals(from) && to.getClass() == Transition.class) {
-              arrOut[to.indexIn(transitions)] += 1;
-            }
-          });
-          place.setInput(new Vector(arrIn));
-          place.setOutput(new Vector(arrOut));
-        })).start();
+        places.forEach(place -> place.setVectors(flow, transitions, transitions.size()))).start();
     new Thread(() ->
-        transitions.forEach(transition -> {
-          int[] arrIn = new int[places.size()];
-          int[] arrOut = new int[places.size()];
-          flow.forEach(edge -> {
-            Node from = edge.getFrom();
-            Node to = edge.getTo();
-            if (transition.equals(to) && from.getClass() == Place.class) {
-              arrIn[from.indexIn(places)] += 1;
-            } else if (transition.equals(from) && to.getClass() == Place.class) {
-              arrOut[to.indexIn(places)] += 1;
-            }
-          });
-          transition.setInput(new Vector(arrIn));
-          transition.setOutput(new Vector(arrOut));
-        })).start();
+        transitions.forEach(transition -> transition.setVectors(flow, places, places.size())))
+        .start();
   }
 
   /**
@@ -131,7 +105,6 @@ public class Petrinet {
   }
 
   //TODO: structural liveness and deadlock-free
-
 
 
   /**
