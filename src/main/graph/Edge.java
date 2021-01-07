@@ -1,6 +1,5 @@
-package graph;
+package main.graph;
 
-import java.util.Objects;
 
 public class Edge<K extends Node, V extends Node> {
 
@@ -18,6 +17,10 @@ public class Edge<K extends Node, V extends Node> {
 
   public V getTo() {
     return to;
+  }
+
+  public Edge<V,K> reverse() {
+    return new Edge<>(this.getTo(), this.getFrom());
   }
 
   @Override
