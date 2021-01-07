@@ -10,3 +10,12 @@ The ```toString()```-methods create an output to display graphs with [graphViz](
 ## coverability graph
 
 ## labelled transition system
+
+# How to use
+## inside IDE 
+Easiest way with the class [Playground](src/main/Playground.java).
+
+## From the commandline
+
+## final build
+TODO: gui

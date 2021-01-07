@@ -1,51 +1,56 @@
 package main;
 
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import main.exception.NotExistingNodeException;
 import main.exception.WrongDimensionException;
+import main.graph.Edge;
 import main.graph.Place;
+import main.graph.Transition;
 import main.graph.Vector;
-import java.util.Arrays;
-import java.util.List;
 
 /**
- * Class to read a petrinet from the command line.
+ * Class to read a petrinet from the command line. Parses a pn-string into lists and creates
+ * petrinet.
  */
 public class PetriReader {
 
   private static Petrinet petrinet;
 
   private static boolean humanReadable, printPetriNet, printCoverabilityGraph;
-  private static String filenameCG, filenamePN, pnString, markingsString, covString;
+  private static String nameCG, namePN, pnString, markingsString;
 
   public static void main(String[] args) throws NotExistingNodeException {
     humanReadable = false;
     printPetriNet = true;
     printCoverabilityGraph = false;
-    filenamePN = "petrinet.gv";
-    filenameCG = "ueb.gv";
+    namePN = "petrinet";
+    nameCG = "ueb";
     pnString = "";
     markingsString = "";
-    covString = "";
     for (String arg : args) {
       readArguments(arg);
     }
     if (pnString.equals("") || markingsString.equals("")) {
-      System.out.println(" Please add your pn-string or add -h for more help.");
+      System.out.println("Please add your pn-string or add -h for more help.");
       System.exit(0);
     }
-    petrinet = new Petrinet(filenamePN.substring(0, filenamePN.length() - 3));
-    readPnString(pnString, markingsString);
+    petrinet = createPetriNetAndMarkings(pnString, markingsString);
 
-    CoverabilityGraph coverabilityGraph = new CoverabilityGraph(petrinet.getMue0(),
-        filenameCG.substring(0, filenameCG.length() - 3), petrinet);
-    covString = coverabilityGraph.toString();
+    CoverabilityGraph coverabilityGraph = new CoverabilityGraph(petrinet.getMue0(), nameCG,
+        petrinet);
 
     //print graphs to commandline
     if (printPetriNet) {
       System.out.print(petrinet.toString());
     }
     if (printCoverabilityGraph) {
-      System.out.println(covString);
+      System.out.println(coverabilityGraph.toString());
     }
   }
 
@@ -58,15 +63,9 @@ public class PetriReader {
     } else if (arg.equals("-r") || arg.equals("--readable")) {
       humanReadable = true;
     } else if (arg.startsWith("--net")) {
-      filenamePN = arg.substring(5);
-      if (!filenamePN.substring(filenamePN.length() - 3).equals(".gv")) {
-        filenamePN += ".gv";
-      }
+      namePN = arg.substring(5);
     } else if (arg.startsWith("--cover")) {
-      filenameCG = arg.substring(5);
-      if (!filenameCG.substring(filenameCG.length() - 3).equals(".gv")) {
-        filenameCG += ".gv";
-      }
+      nameCG = arg.substring(7);
     } else if (arg.equals("--printcover")) {
       printPetriNet = false;
       printCoverabilityGraph = true;
@@ -80,7 +79,7 @@ public class PetriReader {
   }
 
   /**
-   * Creates a petrinet with given strings, when strings are correct.
+   * Creates a petrinet with given strings.
    *
    * @param pnString       string for the petri-net
    * @param markingsString string for the initial mark
@@ -88,25 +87,81 @@ public class PetriReader {
    */
   public static Petrinet createPetriNetAndMarkings(String pnString, String markingsString) {
     Vector mue_0 = new Vector(markingsString.split(","));
-    Petrinet pNet = new Petrinet("petrinet");
+    List<Place> places = new ArrayList<>();
+    List<Transition> transitions = new ArrayList<>();
+    List<Edge> flow = new ArrayList<>();
+
     String[] pnStringParts = pnString.split(";;");
     if (pnStringParts.length == 2) {
-      Arrays.stream(pnStringParts[0].split(";")).map(x -> x.split(":"))
-          .forEach(pNet::addPlaceNodes);
-      Arrays.stream(pnStringParts[1].split(";")).map(x -> x.split(":"))
-          .forEach(pNet::addTransitionNodes);
+      new Thread(() ->
+          Arrays.stream(pnStringParts[0].split(";"))
+              .map(x -> x.split(":"))
+              .map(PetriReader::createPlaceNodes)
+              .forEach(entry -> {
+                places.add(entry.getKey());
+                flow.addAll(entry.getValue());
+              })).start();
+      new Thread(() ->
+          Arrays.stream(pnStringParts[1].split(";"))
+              .map(x -> x.split(":"))
+              .map(PetriReader::createTransitionNodes)
+              .forEach(entry -> {
+                transitions.add(entry.getKey());
+                flow.addAll(entry.getValue());
+              })).start();
     } else {
       throw new IllegalArgumentException("The pn-string needs the right format.");
     }
-    if (mue_0.getLength() == pNet.getPlaces().size()) {
-      pNet.setMue0(mue_0);
-      pNet.setVectors();
-      pNet.setInitialBoundedness();
-    } else {
-      throw new WrongDimensionException(
-          "The markings-string needs the same size as number of places in the petrinet.");
+
+    return new Petrinet(namePN, places, transitions, flow, mue_0);
+  }
+
+  /**
+   * Adds place nodes to the petrinet from pn-string-split.
+   *
+   * @param split split of transition part of pn-string with two parts. First is the obligatory name
+   *              of the place and second the optional list of places cut by commas.
+   * @throws NotExistingNodeException throws a runtime exception, in case the node is invalid.
+   */
+  private static Entry<Place, List<Edge>> createPlaceNodes(String[] split) {
+    if (split.length == 0 || split[0].equals("")) {
+      throw new NotExistingNodeException("Place must be present and have a name.");
     }
-    return pNet;
+    Place place = new Place(split[0]);
+    if (split.length > 1 && !split[1].equals("")) {
+      String[] toNodes = split[1].split(",");
+      if (toNodes.length > 0) {
+        return new SimpleEntry<>(place, Arrays.stream(toNodes)
+            .map(t -> new Edge<>(place, new Transition(t)))
+            .collect(Collectors.toList()));
+      }
+    }
+    return new SimpleEntry<>(place, Collections.emptyList());
+  }
+
+  /**
+   * Adds transition nodes to the petrinet.
+   *
+   * @param split split of place part of pn-string with two parts. First is the obligatory name of
+   *              the transition, which should exist and second the optional list of places cut by
+   *              commas.
+   * @throws NotExistingNodeException throws a runtime exception, in case the node does not exist
+   */
+  public static Entry<Transition, List<Edge>> createTransitionNodes(String[] split)
+      throws NotExistingNodeException {
+    if (split.length == 0 || split[0].equals("")) {
+      throw new NotExistingNodeException("Transition must be present and have a name.");
+    }
+    Transition transition = new Transition(split[0]);
+    if (split.length > 1 && !split[1].equals("")) {
+      String[] toNodes = split[1].split(",");
+      if (toNodes.length > 0) {
+        return new SimpleEntry<>(transition, Arrays.stream(toNodes)
+            .map(p -> new Edge<>(transition, new Place(p)))
+            .collect(Collectors.toList()));
+      }
+    }
+    return new SimpleEntry<>(transition, Collections.emptyList());
   }
 
   /**
@@ -117,30 +172,46 @@ public class PetriReader {
    * @param capacity       vector with capacity of each place
    * @return the constructed petri-net
    */
-  public static Petrinet createPetriNetAndMarkings(String pnString, String markingsString,
-      Vector capacity) {
-    Petrinet pNet = createPetriNetAndMarkings(pnString, markingsString);
-    pNet.setCapacity(capacity);
-    List<Place> places = pNet.getPlaces();
+  public static PetrinetWithCapacity createPetriNetWithCapacityAndMarkings(String pnString,
+      String markingsString, Vector capacity) {
+    //TODO: Auslagern, überlappung mit normalem petrinetz
+    Vector mue_0 = new Vector(markingsString.split(","));
+    List<Place> places = new ArrayList<>();
+    List<Transition> transitions = new ArrayList<>();
+    List<Edge> flow = new ArrayList<>();
+
+    String[] pnStringParts = pnString.split(";;");
+    if (pnStringParts.length == 2) {
+      new Thread(() ->
+          Arrays.stream(pnStringParts[0].split(";"))
+              .map(x -> x.split(":"))
+              .map(PetriReader::createPlaceNodes)
+              .forEach(entry -> {
+                places.add(entry.getKey());
+                flow.addAll(entry.getValue());
+              })).start();
+      new Thread(() ->
+          Arrays.stream(pnStringParts[1].split(";"))
+              .map(x -> x.split(":"))
+              .map(PetriReader::createTransitionNodes)
+              .forEach(entry -> {
+                transitions.add(entry.getKey());
+                flow.addAll(entry.getValue());
+              })).start();
+    } else {
+      throw new IllegalArgumentException("The pn-string needs the right format.");
+    }
+
     if (capacity.getLength() == places.size()) {
       for (int i = 0; i < capacity.getLength(); i++) {
         places.get(i).setCapacity(capacity.get(i));
       }
+      return new PetrinetWithCapacity("petrinet", places, transitions, flow, mue_0, capacity);
     } else {
       throw new WrongDimensionException(
           "The capacity needs to be the same size as number of places in the petrinet.");
     }
-    return pNet;
-  }
 
-  /**
-   * Sets a constructed petri-net as the global net.
-   *
-   * @param pnString       string for the petri-net
-   * @param markingsString string for the initial mark
-   */
-  private static void readPnString(String pnString, String markingsString) {
-    petrinet = createPetriNetAndMarkings(pnString, markingsString);
   }
 
   /**
@@ -148,7 +219,7 @@ public class PetriReader {
    */
   private static void printHelp() {
     System.out.println(" Input of a pn-string and a marking:");
-    //TODO: change to java
+    //TODO: change to java lol
     System.out.println(
         " Call with: 'python pn_string_converter.py -p\"s1:t1,t2;s2:;;t1:s1;t2:s2;;\" -m\"3,0\"'");
     System.out.println(" To change the filename of the petrinet type e.g.: '--net\"petri_net\"'");

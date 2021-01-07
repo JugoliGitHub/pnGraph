@@ -17,7 +17,7 @@ public class LabelledTransitionSystem extends CoverabilityGraph {
    * @param name name of the graph
    * @param petrinet corresponding petrinet
    */
-  public LabelledTransitionSystem(Vector mue0, String name, Petrinet petrinet)
+  public LabelledTransitionSystem(Vector mue0, String name, PetrinetWithCapacity petrinet)
       throws WrongDimensionException {
     super(mue0, name);
     this.petrinet = petrinet;

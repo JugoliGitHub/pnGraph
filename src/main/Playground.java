@@ -1,11 +1,7 @@
 package main;
 
 import main.exception.WrongDimensionException;
-import main.graph.Edge;
-import main.graph.Place;
-import main.graph.Transition;
-import java.util.List;
-import java.util.stream.Collectors;
+import main.graph.Vector;
 
 /**
  * This class is for quick testing inside my IDE.
@@ -25,14 +21,25 @@ public class Playground {
     System.out.println(covGraph);
     System.out
         .println("Bounded: " + (petrinet.getBoundedness() == -1 ? "ω" : petrinet.getBoundedness()));
-    System.out.println("Liveness: " + petrinet.getLiveness()); */
+    System.out.println("Liveness: " + petrinet.getLiveness());
 
     Edge<Place, Transition> edge = new Edge<>(new Place("s1"), new Transition("t1"));
     Edge<Transition, Place> edge2 = edge.reverse();
     List<Edge> fl = List.of(edge, edge2);
     List<Edge> flow = fl.stream().map(Edge::reverse).collect(Collectors.toList());
     System.out.println(flow.toString());
-    System.out.println(fl.toString());
+    System.out.println(fl.toString()); */
+
+    Vector v1 = new Vector(new int[]{1,2});
+    Vector v2 = new Vector(v1.getVectorArray());
+
+    System.out.println(v1);
+    System.out.println(v2);
+
+    v1.addAtIndex(0, 1);
+
+    System.out.println(v1);
+    System.out.println(v2);
   }
 
 }

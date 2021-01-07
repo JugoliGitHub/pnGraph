@@ -29,6 +29,7 @@ public class Vector {
       this.vectorArray = array;
       this.length = vectorArray.length;
     }
+    //TODO: error
   }
 
   public Vector(String vector) {
@@ -69,16 +70,6 @@ public class Vector {
 
   public boolean containsOmega() {
     return Arrays.stream(vectorArray).anyMatch(i -> i == -1);
-  }
-
-  /**
-   * Compares whether another vector equals this.
-   *
-   * @param vector the other vector
-   * @return true when the values are equal
-   */
-  public boolean equals(Vector vector) {
-    return Arrays.equals(vectorArray, vector.getVectorArray());
   }
 
   /**
@@ -180,6 +171,7 @@ public class Vector {
     return false;
   }
 
+  //TODO: return Vector
   public boolean subAtIndex(int index, int value) {
     if(index < vectorArray.length) {
       if(vectorArray[index] != -1) {
@@ -198,6 +190,10 @@ public class Vector {
     if(index >= 0 && index < length) {
       vectorArray[index] = -1;
     }
+  }
+
+  public Vector copy() {
+    return new Vector(vectorArray);
   }
 
   @Override
