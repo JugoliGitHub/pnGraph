@@ -9,10 +9,13 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import main.exception.NotExistingNodeException;
 import main.exception.WrongDimensionException;
-import main.graph.Edge;
-import main.graph.Place;
-import main.graph.Transition;
-import main.graph.Vector;
+import main.graphs.objects.edges.Edge;
+import main.graphs.objects.nodes.Place;
+import main.graphs.objects.nodes.Transition;
+import main.graphs.objects.Vector;
+import main.graphs.CoverabilityGraph;
+import main.graphs.Petrinet;
+import main.graphs.PetrinetWithCapacity;
 
 /**
  * Class to read a petrinet from the command line. Parses a pn-string into lists and creates

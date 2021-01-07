@@ -1,4 +1,4 @@
-package main.graph;
+package main.graphs.objects;
 
 import java.util.Arrays;
 import main.exception.WrongDimensionException;

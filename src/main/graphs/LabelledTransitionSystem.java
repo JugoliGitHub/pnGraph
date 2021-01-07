@@ -1,8 +1,8 @@
-package main;
+package main.graphs;
 
 import main.exception.WrongDimensionException;
-import main.graph.Transition;
-import main.graph.Vector;
+import main.graphs.objects.nodes.Transition;
+import main.graphs.objects.Vector;
 import java.util.ArrayList;
 import java.util.Optional;
 

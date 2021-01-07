@@ -1,6 +1,8 @@
-package main.graph;
+package main.graphs.objects.nodes;
 
 import java.util.List;
+import main.graphs.objects.edges.Edge;
+import main.graphs.objects.Vector;
 
 public abstract class Node {
 
