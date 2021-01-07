@@ -1,14 +1,16 @@
-import exception.NotExistingNodeException;
-import exception.OutOfCapacityException;
-import graph.Edge;
-import graph.Place;
-import graph.Transition;
-import graph.Vector;
+package main;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import graph.Node;
 import java.util.stream.Collectors;
+import main.exception.NotExistingNodeException;
+import main.exception.OutOfCapacityException;
+import main.graph.Edge;
+import main.graph.Node;
+import main.graph.Place;
+import main.graph.Transition;
+import main.graph.Vector;
 
 public class Petrinet {
 
@@ -20,8 +22,9 @@ public class Petrinet {
   private Vector capacity;
 
   /**
-   * Constructor of a Petrinet. Creates an empty petrinet.
-   * Should initialize mue_0, capacity (if present) and places, transitions and flow.
+   * Constructor of a petrinet. Creates an empty petrinet. Should initialize mue_0, capacity (if
+   * present) and places, transitions and flow.
+   *
    * @param name name of the net
    */
   public Petrinet(String name) {
@@ -65,19 +68,30 @@ public class Petrinet {
     return flow;
   }
 
-  public void setCapacity(Vector c) { this.capacity = c; }
+  public void setCapacity(Vector c) {
+    this.capacity = c;
+  }
 
-  public Vector getCapacity() { return capacity; }
+  public Vector getCapacity() {
+    return capacity;
+  }
 
   /**
-   * Adds place nodes to the petrinet.
-   * @param split split of transition part of pn-string
-   * @throws NotExistingNodeException throws a runtime exception, in case the node does not exist
+   * Adds place nodes to the petrinet from pn-string-split.
+   *
+   * @param split split of transition part of pn-string with two parts. First is the obligatory name
+   *              of the place and second the optional list of places cut by commas.
+   * @throws NotExistingNodeException throws a runtime exception, in case the node is invalid.
    */
   public void addPlaceNodes(String[] split) throws NotExistingNodeException {
+    if (split.length == 0 || split[0].equals("")) {
+      throw new NotExistingNodeException("Place must be present and have a name.");
+    }
+
     Place place = new Place(split[0]);
     this.addPlace(place);
-    if (split.length > 1) {
+
+    if (split.length > 1 && !split[1].equals("")) {
       String[] toNodes = split[1].split(",");
       if (toNodes.length > 0) {
         for (String toNode : toNodes) {
@@ -89,13 +103,16 @@ public class Petrinet {
 
   /**
    * Adds transition nodes to the petrinet.
-   * @param split split of place part of pn-string.
+   *
+   * @param split split of place part of pn-string with two parts. First is the obligatory name of
+   *              the transition, which should exist and second the optional list of places cut by
+   *              commas.
    * @throws NotExistingNodeException throws a runtime exception, in case the node does not exist
    */
   public void addTransitionNodes(String[] split) throws NotExistingNodeException {
     Transition transition = new Transition(split[0]);
     this.addTransition(transition);
-    if (split.length > 1) {
+    if (split.length > 1 && !split[1].equals("")) {
       String[] toNodes = split[1].split(",");
       for (String toNode : toNodes) {
         this.addEdge(new Edge<>(transition,
@@ -187,8 +204,10 @@ public class Petrinet {
   public void setInitialBoundedness() {
     if (!capacity.equals(new Vector(0))) {
       for (int i = 0; i < places.size(); i++) {
-        if (mue0.get(i) > capacity.get(i)) throw new OutOfCapacityException("The start marking has "
-            + "to be less-equal than the capacity");
+        if (mue0.get(i) > capacity.get(i)) {
+          throw new OutOfCapacityException("The start marking has "
+              + "to be less-equal than the capacity");
+        }
         places.get(i).setBoundedness(mue0.get(i));
       }
     } else {
@@ -200,6 +219,7 @@ public class Petrinet {
 
   /**
    * Returns the maximal value of a bounded place.
+   *
    * @return -1 for unbounded (omega), k as the maximal bound
    */
   public int getBoundedness() {
@@ -207,6 +227,29 @@ public class Petrinet {
         .findAny()
         .orElse(Collections
             .max(places.stream().map(Place::getBoundedness).collect(Collectors.toList())));
+  }
+
+  /**
+   * Returns the reversed net. That means that the flow changes its direction.
+   *
+   * @return a reversed petrinet
+   */
+  public Petrinet reversed() {
+    List<Edge> flow = this.flow.stream().map(Edge::reverse).collect(Collectors.toList());
+    Petrinet pnReversed = new Petrinet(this.name + "Reversed");
+    places.forEach(pnReversed::addPlace);
+    transitions.forEach(pnReversed::addTransition);
+    flow.forEach(pnReversed::addEdge);
+    return pnReversed;
+  }
+
+  /**
+   * Creates the dual-patrinet.graph to this petrinet.
+   *
+   * @return
+   */
+  public void dual() {
+
   }
 
 }
