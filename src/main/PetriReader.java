@@ -1,13 +1,14 @@
-import exception.NotExistingNodeException;
-import exception.WrongDimensionException;
-import graph.Place;
-import graph.Vector;
-import java.util.ArrayList;
+package main;
+
+import main.exception.NotExistingNodeException;
+import main.exception.WrongDimensionException;
+import main.graph.Place;
+import main.graph.Vector;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * Class to read a Petrinet from the command line.
+ * Class to read a petrinet from the command line.
  */
 public class PetriReader {
 
@@ -127,7 +128,7 @@ public class PetriReader {
       }
     } else {
       throw new WrongDimensionException(
-          "The capacity needs to be the same size as number of places in the petri-net.");
+          "The capacity needs to be the same size as number of places in the petrinet.");
     }
     return pNet;
   }
