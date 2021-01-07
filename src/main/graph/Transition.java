@@ -1,4 +1,4 @@
-package graph;
+package main.graph;
 
 public class Transition extends Node {
 

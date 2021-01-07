@@ -1,6 +1,6 @@
-package exception;
+package main.exception;
 
-public class NotExistingNodeException extends RuntimeException {
+public class NotExistingNodeException extends RuntimeException{
 
   public NotExistingNodeException() { super(); }
 
