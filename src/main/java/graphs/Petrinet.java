@@ -151,7 +151,9 @@ public class Petrinet {
       } else {
         StringBuilder label = new StringBuilder();
         if (mue0.get(i) <= 6) {
-          label.append("&bull;".repeat(mue0.get(i)));
+          for (int j = 0; j < i; j++) {
+            label.append("&bull;");
+          }
         } else {
           label.append(mue0.get(i));
         }
