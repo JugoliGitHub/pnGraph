@@ -15,8 +15,8 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
-
   <dependencies>
+    <!-- tests -->
     <!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
     <dependency>
       <groupId>org.mockito</groupId>
@@ -31,6 +31,7 @@
       <version>5.6.2</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
+
+  <!-- todo: add jacoco, test ... -->
 </project>
