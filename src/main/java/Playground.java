@@ -1,7 +1,5 @@
-package main;
-
-import main.exception.WrongDimensionException;
-import main.graphs.objects.Vector;
+import exception.WrongDimensionException;
+import graphs.objects.Vector;
 
 /**
  * This class is for quick testing inside my IDE.

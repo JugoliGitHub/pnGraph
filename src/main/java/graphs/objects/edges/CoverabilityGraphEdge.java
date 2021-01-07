@@ -1,8 +1,8 @@
-package main.graphs.objects.edges;
+package graphs.objects.edges;
 
 import java.util.Objects;
-import main.graphs.objects.Vector;
-import main.graphs.objects.nodes.Transition;
+import graphs.objects.Vector;
+import graphs.objects.nodes.Transition;
 
 public class CoverabilityGraphEdge {
 

@@ -23,7 +23,7 @@ place1 : transitions; place2 : transitions;; transition2 : places;;
 
 # Use
 ## inside IDE 
-Easiest way with the class [Playground](src/main/Playground.java).
+Easiest way with the class [Playground](src/main/java/Playground.java).
 
 ## From the commandline
 

@@ -1,6 +1,6 @@
-package main.graphs.objects.edges;
+package graphs.objects.edges;
 
-import main.graphs.objects.nodes.Node;
+import graphs.objects.nodes.Node;
 
 public class Edge<K extends Node, V extends Node> {
 

@@ -1,8 +1,8 @@
-package main.graphs.objects.nodes;
+package graphs.objects.nodes;
 
 import java.util.List;
-import main.graphs.objects.edges.Edge;
-import main.graphs.objects.Vector;
+import graphs.objects.edges.Edge;
+import graphs.objects.Vector;
 
 public class Transition extends Node {
 

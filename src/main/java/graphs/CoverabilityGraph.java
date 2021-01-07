@@ -1,11 +1,11 @@
-package main.graphs;
+package graphs;
 
-import main.exception.WrongDimensionException;
-import main.graphs.objects.edges.CoverabilityGraphEdge;
-import main.graphs.objects.edges.Edge;
-import main.graphs.objects.nodes.Place;
-import main.graphs.objects.nodes.Transition;
-import main.graphs.objects.Vector;
+import exception.WrongDimensionException;
+import graphs.objects.edges.CoverabilityGraphEdge;
+import graphs.objects.edges.Edge;
+import graphs.objects.nodes.Place;
+import graphs.objects.nodes.Transition;
+import graphs.objects.Vector;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

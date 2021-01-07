@@ -1,7 +1,7 @@
-package main.graphs.objects;
+package graphs.objects;
 
 import java.util.Arrays;
-import main.exception.WrongDimensionException;
+import exception.WrongDimensionException;
 import java.util.stream.Stream;
 
 public class Vector {

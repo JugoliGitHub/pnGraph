@@ -1,4 +1,4 @@
-package main.exception;
+package exception;
 
 public class OutOfCapacityException extends RuntimeException {
 

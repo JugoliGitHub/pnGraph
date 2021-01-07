@@ -1,5 +1,3 @@
-package main;
-
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,15 +5,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import main.exception.NotExistingNodeException;
-import main.exception.WrongDimensionException;
-import main.graphs.objects.edges.Edge;
-import main.graphs.objects.nodes.Place;
-import main.graphs.objects.nodes.Transition;
-import main.graphs.objects.Vector;
-import main.graphs.CoverabilityGraph;
-import main.graphs.Petrinet;
-import main.graphs.PetrinetWithCapacity;
+import exception.NotExistingNodeException;
+import exception.WrongDimensionException;
+import graphs.objects.edges.Edge;
+import graphs.objects.nodes.Place;
+import graphs.objects.nodes.Transition;
+import graphs.objects.Vector;
+import graphs.CoverabilityGraph;
+import graphs.Petrinet;
+import graphs.PetrinetWithCapacity;
 
 /**
  * Class to read a petrinet from the command line. Parses a pn-string into lists and creates

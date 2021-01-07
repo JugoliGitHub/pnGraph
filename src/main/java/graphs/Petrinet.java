@@ -1,14 +1,14 @@
-package main.graphs;
+package graphs;
 
+import graphs.objects.Vector;
+import graphs.objects.edges.Edge;
+import graphs.objects.nodes.Node;
+import graphs.objects.nodes.Place;
+import graphs.objects.nodes.Transition;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import main.graphs.objects.edges.Edge;
-import main.graphs.objects.nodes.Node;
-import main.graphs.objects.nodes.Place;
-import main.graphs.objects.nodes.Transition;
-import main.graphs.objects.Vector;
 
 public class Petrinet {
 
