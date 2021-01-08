@@ -32,7 +32,9 @@ public class Petrinet {
     this.transitions = transitions;
     this.flow = flow;
     this.mue0 = mue0;
-    checkCorrectness();
+    if (!checkCorrectness()) {
+      throw new IllegalArgumentException("This is no valid petrinet");
+    }
     setVectors();
     setInitialBoundedness();
   }
@@ -41,11 +43,9 @@ public class Petrinet {
     return this.mue0;
   }
 
-  public void addPlace(Place place) {
-    //TODO: change vector mue 0
-    //TODO  return new Petrinet with an extra place
-    this.places.add(place);
-  }
+  //TODO: change vector mue 0
+  //TODO  return new Petrinet with an extra place
+  public void addPlace(Place place) { places.add(place); }
 
   public List<Place> getPlaces() {
     return places;
@@ -87,9 +87,19 @@ public class Petrinet {
     }
   }
 
-  protected void checkCorrectness() {
+  protected boolean checkCorrectness() {
     // TODO: check correctness
     // throw exceptions and kill user D:
+    return isSameLength();
+  }
+
+  private boolean isSameLength() {
+    return mue0.getLength() == places.size();
+  }
+
+  public boolean containsLoop() {
+    //TODO: implement
+    return false;
   }
 
   /**
@@ -103,7 +113,6 @@ public class Petrinet {
   }
 
   //TODO: structural liveness and deadlock-free
-
 
   /**
    * Returns the maximal value of a bounded place.
@@ -166,6 +175,11 @@ public class Petrinet {
     return out.append("\n").toString();
   }
 
+  /**
+   * Checks whether two petrinets are same or not.
+   * @param petrinet other petrinet
+   * @return boolean if true
+   */
   public boolean equals(Petrinet petrinet) {
     //TODO: implement
     // two nets can be equal beside their place/transition names

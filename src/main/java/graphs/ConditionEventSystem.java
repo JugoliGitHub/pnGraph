@@ -25,7 +25,8 @@ class ConditionEventSystem extends PetrinetWithCapacity {
   }
 
   @Override
-  protected void checkCorrectness() {
+  protected boolean checkCorrectness() {
     //TODO: no loops, multiple edges
+    return true;
   }
 }
