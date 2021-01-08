@@ -1,10 +1,10 @@
 package graphs;
 
-import java.util.List;
+import graphs.objects.Vector;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
-import graphs.objects.Vector;
+import java.util.List;
 
 public class PetrinetWithCapacity extends Petrinet {
 

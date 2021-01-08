@@ -28,7 +28,7 @@ public class Playground {
     System.out.println(flow.toString());
     System.out.println(fl.toString()); */
 
-    Vector v1 = new Vector(new int[]{1,2});
+    Vector v1 = new Vector(new int[]{1, 2});
     Vector v2 = new Vector(v1.getVectorArray());
 
     System.out.println(v1);

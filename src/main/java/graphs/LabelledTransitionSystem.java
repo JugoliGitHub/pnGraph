@@ -1,8 +1,9 @@
 package graphs;
 
 import exception.WrongDimensionException;
-import graphs.objects.nodes.Transition;
 import graphs.objects.Vector;
+import graphs.objects.nodes.Transition;
+
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -13,8 +14,8 @@ public class LabelledTransitionSystem extends CoverabilityGraph {
   /**
    * Constructor
    *
-   * @param mue0 marking at the beginning
-   * @param name name of the graph
+   * @param mue0     marking at the beginning
+   * @param name     name of the graph
    * @param petrinet corresponding petrinet
    */
   public LabelledTransitionSystem(Vector mue0, String name, PetrinetWithCapacity petrinet)
@@ -29,15 +30,16 @@ public class LabelledTransitionSystem extends CoverabilityGraph {
   }
 
   @Override
-  protected Optional<Vector> fire(Vector mue, Transition transition) throws WrongDimensionException {
+  protected Optional<Vector> fire(Vector mue, Transition transition)
+      throws WrongDimensionException {
     Vector newMue = new Vector(mue.getLength());
     newMue = newMue.add(mue);
     if (transition.getOutput().getLength() == 0 || transition.getInput().getLength() == 0) {
       throw new IllegalArgumentException("Initialize in- and output first.");
     } else if (transition.getInput().lessEquals(mue)
-          && newMue.sub(transition.getInput()).add(transition.getOutput())
-          .lessEquals(capacity)) {
-        newMue = newMue.sub(transition.getInput()).add(transition.getOutput());
+        && newMue.sub(transition.getInput()).add(transition.getOutput())
+        .lessEquals(capacity)) {
+      newMue = newMue.sub(transition.getInput()).add(transition.getOutput());
       setBoundednessOfPlaces(mue, newMue);
     } else {
       return Optional.empty();

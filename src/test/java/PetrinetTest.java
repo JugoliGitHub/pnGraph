@@ -23,7 +23,7 @@ public class PetrinetTest {
 
   @BeforeEach
   void setUp() {
-    pn = new Petrinet("petrinet", places, transitions, flow, mue0);
+    //pn = new Petrinet("petrinet", places, transitions, flow, mue0);
   }
 
   @Test

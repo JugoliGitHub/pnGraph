@@ -1,10 +1,11 @@
 package graphs;
 
-import java.util.List;
 import graphs.objects.Vector;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
+
+import java.util.List;
 
 class ConditionEventSystem extends PetrinetWithCapacity {
 
@@ -12,7 +13,7 @@ class ConditionEventSystem extends PetrinetWithCapacity {
    * Creates an empty petrinet. Should initialize mue_0, capacity (if present) and places,
    * transitions and flow.
    *
-   * @param name        name of the net
+   * @param name       name of the net
    * @param conditions
    * @param events
    * @param flow

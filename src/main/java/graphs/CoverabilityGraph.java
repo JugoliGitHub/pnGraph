@@ -1,17 +1,18 @@
 package graphs;
 
 import exception.WrongDimensionException;
+import graphs.objects.Vector;
 import graphs.objects.edges.CoverabilityGraphEdge;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
-import graphs.objects.Vector;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * A class to create coverability-graphs for a petri-net
+ * A class to create coverability-graphs for a petrinet.
  */
 public class CoverabilityGraph {
 
@@ -61,7 +62,7 @@ public class CoverabilityGraph {
    */
   public boolean addToMarkings(Vector mark) {
     Optional<Vector> opt = markings.stream().filter(elem -> elem.equals(mark)).findFirst();
-    return opt.isPresent() ? false : markings.add(mark);
+    return !opt.isPresent() && markings.add(mark);
   }
 
   /**
@@ -73,7 +74,7 @@ public class CoverabilityGraph {
   public boolean addToKnots(CoverabilityGraphEdge edge) {
     Optional<CoverabilityGraphEdge> opt = knots.stream().filter(elem -> elem.equals(edge))
         .findFirst();
-    return opt.isPresent() ? false : knots.add(edge);
+    return !opt.isPresent() && knots.add(edge);
   }
 
   /**
@@ -84,7 +85,7 @@ public class CoverabilityGraph {
    */
   private boolean addToVisited(Vector newVector) {
     Optional<Vector> opt = visited.stream().filter(elem -> elem.equals(newVector)).findFirst();
-    return opt.isPresent() ? false : visited.add(newVector);
+    return !opt.isPresent() && visited.add(newVector);
   }
 
   /**
@@ -97,23 +98,24 @@ public class CoverabilityGraph {
    * @return An Optional which is empty, when the transition could not be fired
    * @throws WrongDimensionException when the vector has a different dimension
    */
-  protected Optional<Vector> fire(Vector mue, Transition transition) throws WrongDimensionException {
+  protected Optional<Vector> fire(Vector mue, Transition transition)
+      throws WrongDimensionException {
     Vector newMue = new Vector(mue.getLength());
     newMue = newMue.add(mue);
     if (transition.getOutput().getLength() == 0 || transition.getInput().getLength() == 0) {
       if (petrinet.getTransitions().contains(transition)) {
-        List<Place> front_places = new ArrayList<>();
-        List<Place> end_places = new ArrayList<>();
+        List<Place> frontPlaces = new ArrayList<>();
+        List<Place> endPlaces = new ArrayList<>();
 
         for (Edge edge : petrinet.getFlow()) {
           if (edge.getFrom().equals(transition) && edge.getTo() instanceof Place) {
-            end_places.add((Place) edge.getTo());
+            endPlaces.add((Place) edge.getTo());
           } else if (edge.getTo().equals(transition) && edge.getFrom() instanceof Place) {
-            front_places.add((Place) edge.getFrom());
+            frontPlaces.add((Place) edge.getFrom());
           }
         }
 
-        for (Place place : front_places) {
+        for (Place place : frontPlaces) {
           int index = petrinet.getPlaces().indexOf(place);
           int newValueOfPlace = newMue.get(index);
           if (newValueOfPlace == 0) {
@@ -124,7 +126,7 @@ public class CoverabilityGraph {
             }
           }
         }
-        for (Place place : end_places) {
+        for (Place place : endPlaces) {
           int index = petrinet.getPlaces().indexOf(place);
           int newValueOfPlace = newMue.get(index);
           newMue.addAtIndex(index, 1);
@@ -207,16 +209,17 @@ public class CoverabilityGraph {
     return mue;
   }
 
-  protected void setLiveness(Transition t) {
+  protected void setLiveness(Transition transition) {
     //TODO: when is alive?
-    if (knots.stream().filter(k -> k.getTransition() == t).allMatch(this::findLoop)) {
-      t.setLiveness(2);
-    } else if (knots.stream().filter(k -> k.getTransition() == t).anyMatch(this::findLoop)) {
-      t.setLiveness(1);
-    } else if (knots.stream().anyMatch(k -> k.getTransition() == t)) {
-      t.setLiveness(0);
+    if (knots.stream().filter(k -> k.getTransition() == transition).allMatch(this::findLoop)) {
+      transition.setLiveness(2);
+    } else if (knots.stream().filter(k -> k.getTransition() == transition)
+        .anyMatch(this::findLoop)) {
+      transition.setLiveness(1);
+    } else if (knots.stream().anyMatch(k -> k.getTransition() == transition)) {
+      transition.setLiveness(0);
     } else {
-      t.setLiveness(-1);
+      transition.setLiveness(-1);
     }
   }
 

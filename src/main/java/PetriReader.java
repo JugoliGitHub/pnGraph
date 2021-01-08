@@ -1,3 +1,13 @@
+import exception.NotExistingNodeException;
+import exception.WrongDimensionException;
+import graphs.CoverabilityGraph;
+import graphs.Petrinet;
+import graphs.PetrinetWithCapacity;
+import graphs.objects.Vector;
+import graphs.objects.edges.Edge;
+import graphs.objects.nodes.Place;
+import graphs.objects.nodes.Transition;
+
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -5,15 +15,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import exception.NotExistingNodeException;
-import exception.WrongDimensionException;
-import graphs.objects.edges.Edge;
-import graphs.objects.nodes.Place;
-import graphs.objects.nodes.Transition;
-import graphs.objects.Vector;
-import graphs.CoverabilityGraph;
-import graphs.Petrinet;
-import graphs.PetrinetWithCapacity;
 
 /**
  * Class to read a petrinet from the command line. Parses a pn-string into lists and creates
@@ -23,8 +24,13 @@ public class PetriReader {
 
   private static Petrinet petrinet;
 
-  private static boolean humanReadable, printPetriNet, printCoverabilityGraph;
-  private static String nameCG, namePN, pnString, markingsString;
+  private static boolean humanReadable;
+  private static boolean printPetriNet;
+  private static boolean printCoverabilityGraph;
+  private static String nameCG;
+  private static String namePN;
+  private static String pnString;
+  private static String markingsString;
 
   public static void main(String[] args) throws NotExistingNodeException {
     humanReadable = false;
@@ -87,7 +93,7 @@ public class PetriReader {
    * @return the constructed petri-net
    */
   public static Petrinet createPetriNetAndMarkings(String pnString, String markingsString) {
-    Vector mue_0 = new Vector(markingsString.split(","));
+    Vector mue0 = new Vector(markingsString.split(","));
     List<Place> places = new ArrayList<>();
     List<Transition> transitions = new ArrayList<>();
     List<Edge> flow = new ArrayList<>();
@@ -114,7 +120,7 @@ public class PetriReader {
       throw new IllegalArgumentException("The pn-string needs the right format.");
     }
 
-    return new Petrinet(namePN, places, transitions, flow, mue_0);
+    return new Petrinet(namePN, places, transitions, flow, mue0);
   }
 
   /**
@@ -176,7 +182,7 @@ public class PetriReader {
   public static PetrinetWithCapacity createPetriNetWithCapacityAndMarkings(String pnString,
       String markingsString, Vector capacity) {
     //TODO: Auslagern, überlappung mit normalem petrinetz
-    Vector mue_0 = new Vector(markingsString.split(","));
+    Vector mue0 = new Vector(markingsString.split(","));
     List<Place> places = new ArrayList<>();
     List<Transition> transitions = new ArrayList<>();
     List<Edge> flow = new ArrayList<>();
@@ -207,7 +213,7 @@ public class PetriReader {
       for (int i = 0; i < capacity.getLength(); i++) {
         places.get(i).setCapacity(capacity.get(i));
       }
-      return new PetrinetWithCapacity("petrinet", places, transitions, flow, mue_0, capacity);
+      return new PetrinetWithCapacity("petrinet", places, transitions, flow, mue0, capacity);
     } else {
       throw new WrongDimensionException(
           "The capacity needs to be the same size as number of places in the petrinet.");

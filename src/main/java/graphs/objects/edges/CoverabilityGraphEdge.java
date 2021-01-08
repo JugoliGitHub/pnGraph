@@ -1,13 +1,15 @@
 package graphs.objects.edges;
 
-import java.util.Objects;
 import graphs.objects.Vector;
 import graphs.objects.nodes.Transition;
 
+import java.util.Objects;
+
 public class CoverabilityGraphEdge {
 
-  private Vector from, to;
-  private Transition transition;
+  private final Vector from;
+  private final Vector to;
+  private final Transition transition;
 
   public CoverabilityGraphEdge(Vector from, Transition transition, Vector to) {
     this.from = from;
@@ -34,17 +36,17 @@ public class CoverabilityGraphEdge {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object obj) {
+    if (this == obj) {
       return true;
     }
-    if (!(o instanceof CoverabilityGraphEdge)) {
+    if (!(obj instanceof CoverabilityGraphEdge)) {
       return false;
     }
-    CoverabilityGraphEdge that = (CoverabilityGraphEdge) o;
-    return from.equals(that.from) &&
-        to.equals(that.to) &&
-        transition.equals(that.transition);
+    CoverabilityGraphEdge that = (CoverabilityGraphEdge) obj;
+    return from.equals(that.from)
+        && to.equals(that.to)
+        && transition.equals(that.transition);
   }
 
   @Override

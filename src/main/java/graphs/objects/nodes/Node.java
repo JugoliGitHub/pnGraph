@@ -1,13 +1,15 @@
 package graphs.objects.nodes;
 
-import java.util.List;
-import graphs.objects.edges.Edge;
 import graphs.objects.Vector;
+import graphs.objects.edges.Edge;
+
+import java.util.List;
 
 public abstract class Node {
 
   protected String label;
-  protected Vector input, output;
+  protected Vector input;
+  protected Vector output;
 
   protected Node(String label) {
     this.label = label;
@@ -21,14 +23,6 @@ public abstract class Node {
     this.output = new Vector(size);
   }
 
-  public void setOutput(Vector output) {
-    this.output = output;
-  }
-
-  public void setInput(Vector input) {
-    this.input = input;
-  }
-
   /**
    * TODO: add description
    *
@@ -38,13 +32,27 @@ public abstract class Node {
    */
   public abstract void setVectors(List<Edge> flow, List<? extends Node> otherNodes, int dimension);
 
-  public Vector getInput() { return input; }
+  public Vector getInput() {
+    return input;
+  }
 
-  public Vector getOutput() { return output; }
+  public void setInput(Vector input) {
+    this.input = input;
+  }
+
+  public Vector getOutput() {
+    return output;
+  }
+
+  public void setOutput(Vector output) {
+    this.output = output;
+  }
 
   public int indexIn(List<? extends Node> list) {
-    for(int i = 0; i < list.size(); i++) {
-      if (list.get(i).equals(this)) return i;
+    for (int i = 0; i < list.size(); i++) {
+      if (list.get(i).equals(this)) {
+        return i;
+      }
     }
     return -1;
   }
@@ -54,6 +62,8 @@ public abstract class Node {
     return label;
   }
 
-  public boolean equals(Node node) { return label.equals(node.label); }
+  public boolean equals(Node node) {
+    return label.equals(node.label);
+  }
 
 }

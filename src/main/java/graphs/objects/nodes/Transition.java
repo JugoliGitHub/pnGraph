@@ -1,8 +1,9 @@
 package graphs.objects.nodes;
 
-import java.util.List;
-import graphs.objects.edges.Edge;
 import graphs.objects.Vector;
+import graphs.objects.edges.Edge;
+
+import java.util.List;
 
 public class Transition extends Node {
 
@@ -12,6 +13,7 @@ public class Transition extends Node {
 
   /**
    * Constructor of a transition.
+   *
    * @param label label of the transition
    */
   public Transition(String label) {
@@ -37,29 +39,43 @@ public class Transition extends Node {
   }
 
   /**
+   * Returns the liveness.
+   *
+   * @return -1: dead; 0: not dead; 1: weak liveness; 2: alive
+   */
+  public int getLiveness() {
+    return liveness;
+  }
+
+  /**
    * Can upgrade the liveness.
+   *
    * @param liveness -1: dead; 0: not dead; 1: weak liveness; 2: alive
    */
   public void setLiveness(int liveness) {
-    if(liveness >= -1 && liveness <= 2) {
-      if(this.liveness < liveness) this.liveness = liveness;
+    if (liveness >= -1 && liveness <= 2) {
+      if (this.liveness < liveness) {
+        this.liveness = liveness;
+      }
     } else {
       throw new IllegalArgumentException("The liveness is identified by numbers between -1 and 2.");
     }
   }
 
-  /**
-   * Returns the liveness.
-   * @return -1: dead; 0: not dead; 1: weak liveness; 2: alive
-   */
-  public int getLiveness() { return liveness; }
+  public boolean isDead() {
+    return liveness == -1;
+  }
 
-  public boolean isDead() { return liveness == -1; }
+  public boolean isNotDead() {
+    return liveness >= 0;
+  }
 
-  public boolean isNotDead() { return liveness >= 0; }
+  public boolean isWeakAlive() {
+    return liveness >= 1;
+  }
 
-  public boolean isWeakAlive() { return liveness >= 1; }
-
-  public boolean isAlive() { return liveness == 2; }
+  public boolean isAlive() {
+    return liveness == 2;
+  }
 
 }

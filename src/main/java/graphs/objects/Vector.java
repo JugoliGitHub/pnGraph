@@ -1,7 +1,8 @@
 package graphs.objects;
 
-import java.util.Arrays;
 import exception.WrongDimensionException;
+
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 public class Vector {
@@ -19,7 +20,7 @@ public class Vector {
 
   public Vector(int length, int value) {
     this(length);
-    for(int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++) {
       this.vectorArray[i] = value;
     }
   }
@@ -100,7 +101,9 @@ public class Vector {
    */
   public boolean lessEquals(Vector vector) {
     if (length == vector.getLength()) {
-      if (this.equals(vector)) return true;
+      if (this.equals(vector)) {
+        return true;
+      }
       for (int i = 0; i < length; i++) {
         int thisInt = this.vectorArray[i];
         int thatInt = vector.get(i);
@@ -122,12 +125,14 @@ public class Vector {
     if (vector.length == length) {
       Vector temp = new Vector(vectorArray.clone());
       for (int i = 0; i < length; i++) {
-        if(temp.vectorArray[i] == -1) continue;
+        if (temp.vectorArray[i] == -1) {
+          continue;
+        }
         if (vector.get(i) >= 0) {
-          if(temp.vectorArray[i] >= 0) {
+          if (temp.vectorArray[i] >= 0) {
             temp.vectorArray[i] += vector.get(i);
           }
-        } else if(vector.get(i) == -1) {
+        } else if (vector.get(i) == -1) {
           temp.vectorArray[i] = -1;
         } else {
           throw new IllegalArgumentException("Can´t add with omega or negative values.");
@@ -140,17 +145,18 @@ public class Vector {
   }
 
   /**
+   * Returns the difference between this vector and the parameter.
    *
-   * @param vector
+   * @param vector vector to subtract
    * @return the difference or an empty vector if it did not work
    */
   public Vector sub(Vector vector) {
-    if(this.length != vector.length) {
+    if (this.length != vector.length) {
       return new Vector(0);
     }
     Vector temp = new Vector(vectorArray.clone());
-    for(int i = 0; i < length; i++) {
-      if(!temp.subAtIndex(i, vector.get(i))) {
+    for (int i = 0; i < length; i++) {
+      if (!temp.subAtIndex(i, vector.get(i))) {
         return new Vector(0);
       }
     }
@@ -158,9 +164,9 @@ public class Vector {
   }
 
   public boolean addAtIndex(int index, int value) {
-    if(index < vectorArray.length) {
-      if(vectorArray[index] != -1) {
-        if(value < 0) {
+    if (index < vectorArray.length) {
+      if (vectorArray[index] != -1) {
+        if (value < 0) {
           return false;
         } else {
           vectorArray[index] += value;
@@ -173,9 +179,9 @@ public class Vector {
 
   //TODO: return Vector
   public boolean subAtIndex(int index, int value) {
-    if(index < vectorArray.length) {
-      if(vectorArray[index] != -1) {
-        if(value < 0 || vectorArray[index] < value) {
+    if (index < vectorArray.length) {
+      if (vectorArray[index] != -1) {
+        if (value < 0 || vectorArray[index] < value) {
           return false;
         } else {
           vectorArray[index] -= value;
@@ -187,7 +193,7 @@ public class Vector {
   }
 
   public void setOmega(int index) {
-    if(index >= 0 && index < length) {
+    if (index >= 0 && index < length) {
       vectorArray[index] = -1;
     }
   }

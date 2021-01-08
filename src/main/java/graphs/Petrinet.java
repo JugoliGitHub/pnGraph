@@ -5,6 +5,7 @@ import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Node;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,9 +37,6 @@ public class Petrinet {
     setInitialBoundedness();
   }
 
-  /***********************/
-  /** Getter and Setter **/
-  /***********************/
   public Vector getMue0() {
     return this.mue0;
   }

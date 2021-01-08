@@ -20,7 +20,7 @@ public class Edge<K extends Node, V extends Node> {
     return to;
   }
 
-  public Edge<V,K> reverse() {
+  public Edge<V, K> reverse() {
     return new Edge<>(this.getTo(), this.getFrom());
   }
 
