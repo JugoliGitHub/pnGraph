@@ -1,4 +1,9 @@
+import graphs.Petrinet;
 import graphs.objects.Vector;
+import graphs.objects.edges.Edge;
+import graphs.objects.nodes.Place;
+import graphs.objects.nodes.Transition;
+import java.util.List;
 
 /**
  * This class is for quick testing inside my IDE.
@@ -35,11 +40,18 @@ public class Playground {
     System.out.println(flow.toString());
     System.out.println(fl.toString()); */
 
-    Vector v1 = new Vector(new int[]{1, 2});
-    Vector v2 = v1.subAtIndex(0, 1);
+    Place p1 = new Place("1");
+    Place p2 = new Place("2");
+    Transition t1 = new Transition("t1");
+    Petrinet petri1 = new Petrinet("",
+        List.of(p1, p2),
+        List.of(t1),
+        List.of(new Edge(p1, t1), new Edge(t1, p2)),
+        new Vector(new int[]{1, 0}));
 
-    System.out.println(v1);
-    System.out.println(v2);
+    System.out.println(petri1);
+    System.out.println(petri1.reversed());
+    System.out.println(petri1.dual());
   }
 
 }

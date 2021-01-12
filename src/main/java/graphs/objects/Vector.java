@@ -29,7 +29,7 @@ public class Vector {
    * @param value  the value
    */
   public Vector(int length, int value) {
-    if (length <= 0) {
+    if (length < 0) {
       throw new IllegalArgumentException("The size must be at least 1.");
     }
     if (value < -1) {

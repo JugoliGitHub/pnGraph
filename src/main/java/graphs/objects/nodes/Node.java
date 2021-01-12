@@ -47,6 +47,10 @@ public abstract class Node {
     this.output = output;
   }
 
+  public String getLabel() {
+    return this.label;
+  }
+
   /**
    * Returns the index of this node in a list of implemented nodes.
    *

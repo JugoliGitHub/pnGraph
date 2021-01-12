@@ -5,7 +5,6 @@ import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Node;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -137,20 +136,45 @@ public class Petrinet {
    * @return a reversed petrinet
    */
   public Petrinet reversed() {
-    return new Petrinet(this.name + "Reversed", new ArrayList<>(places),
-        new ArrayList<>(transitions), flow.stream().map(Edge::reverse).collect(Collectors.toList()),
+    return new Petrinet(this.name + "Reversed", List.copyOf(places),
+        List.copyOf(transitions), flow.stream().map(Edge::reverse).collect(Collectors.toList()),
         mue0.copy());
   }
 
   /**
-   * Creates the dual-graph to this petrinet.
+   * Creates the dual-graph to this petrinet. This means every place becomes a transition and vice
+   * versa.
    *
-   * @return
+   * @return a new petrinet but without markings
    */
-  // public Petrinet dual() {
-  public void dual() {
-    // TODO: implement
-    // return
+  public Petrinet dual() {
+    List<Place> newPlaces = reverseTransitionsToPlaces();
+    List<Transition> newTransitions = reversePlacesToTransitions();
+    return new Petrinet(this.name + "Dual", newPlaces, newTransitions, List.copyOf(flow),
+        new Vector(newPlaces.size()));
+  }
+
+  /**
+   * Return a dual-petrinet with markings.
+   *
+   * @param markings new combination of markings for new places
+   * @return a new petrinet but with markings
+   */
+  public Petrinet dual(Vector markings) {
+    List<Place> newPlaces = reverseTransitionsToPlaces();
+    List<Transition> newTransitions = reversePlacesToTransitions();
+    return new Petrinet(this.name + "Dual", newPlaces, newTransitions, List.copyOf(flow),
+        markings);
+  }
+
+  private List<Place> reverseTransitionsToPlaces() {
+    return transitions.stream().map(transition -> new Place(transition.getLabel()))
+        .collect(Collectors.toList());
+  }
+
+  private List<Transition> reversePlacesToTransitions() {
+    return places.stream().map(place -> new Transition(place.getLabel()))
+        .collect(Collectors.toList());
   }
 
   @Override
