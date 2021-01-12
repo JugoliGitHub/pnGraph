@@ -1,8 +1,7 @@
-//import static org.hamcrest.MatcherAssert.assertThat;
+package graphs;//import static org.hamcrest.MatcherAssert.assertThat;
 
 import static org.junit.Assert.assertEquals;
 
-import graphs.Petrinet;
 import graphs.objects.Vector;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Place;

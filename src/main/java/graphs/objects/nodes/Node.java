@@ -2,7 +2,6 @@ package graphs.objects.nodes;
 
 import graphs.objects.Vector;
 import graphs.objects.edges.Edge;
-
 import java.util.List;
 
 public abstract class Node {
@@ -24,11 +23,11 @@ public abstract class Node {
   }
 
   /**
-   * TODO: add description
+   * Sets the input and output vectors.
    *
-   * @param flow
-   * @param otherNodes
-   * @param dimension
+   * @param flow       flow of the petrinet
+   * @param otherNodes nodes of other type from the petrinet
+   * @param dimension  length of the other nodes
    */
   public abstract void setVectors(List<Edge> flow, List<? extends Node> otherNodes, int dimension);
 
@@ -48,6 +47,12 @@ public abstract class Node {
     this.output = output;
   }
 
+  /**
+   * Returns the index of this node in a list of implemented nodes.
+   *
+   * @param list the list of nodes of this type
+   * @return the index or -1 if not in list
+   */
   public int indexIn(List<? extends Node> list) {
     for (int i = 0; i < list.size(); i++) {
       if (list.get(i).equals(this)) {

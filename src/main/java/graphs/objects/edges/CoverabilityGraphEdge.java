@@ -3,14 +3,22 @@ package graphs.objects.edges;
 import graphs.objects.Vector;
 import graphs.objects.nodes.Transition;
 
-import java.util.Objects;
-
+/**
+ * An edge of a coverability graph for petrinets. Has markings as nodes which it connects.
+ */
 public class CoverabilityGraphEdge {
 
   private final Vector from;
   private final Vector to;
   private final Transition transition;
 
+  /**
+   * Creates a new edge of a coverability-graph.
+   *
+   * @param from       the from marking
+   * @param transition the used transition
+   * @param to         the to marking
+   */
   public CoverabilityGraphEdge(Vector from, Transition transition, Vector to) {
     this.from = from;
     this.to = to;
@@ -47,10 +55,5 @@ public class CoverabilityGraphEdge {
     return from.equals(that.from)
         && to.equals(that.to)
         && transition.equals(that.transition);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(from, to, transition);
   }
 }

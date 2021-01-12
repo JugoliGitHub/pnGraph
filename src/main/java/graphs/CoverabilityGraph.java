@@ -6,7 +6,6 @@ import graphs.objects.edges.CoverabilityGraphEdge;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,10 +25,13 @@ public class CoverabilityGraph {
   protected List<Vector> visited;
 
   /**
-   * Constructor
+   * Constructor of a coverability-graph.
+   *
+   * @param mue0     the start marking
+   * @param name     the name of this graph
+   * @param petrinet corresponding petrinet
    */
-  public CoverabilityGraph(Vector mue0, String name, Petrinet petrinet)
-      throws WrongDimensionException {
+  public CoverabilityGraph(Vector mue0, String name, Petrinet petrinet) {
     this.name = name;
     this.mue0 = mue0;
     this.markings = new ArrayList<>();
@@ -121,7 +123,8 @@ public class CoverabilityGraph {
           if (newValueOfPlace == 0) {
             return Optional.empty();
           } else if (newValueOfPlace >= 1) {
-            if (!newMue.subAtIndex(index, 1)) {
+            newMue = newMue.subAtIndex(index, 1);
+            if (newMue.getLength() == 0) {
               return Optional.empty();
             }
           }
@@ -129,7 +132,7 @@ public class CoverabilityGraph {
         for (Place place : endPlaces) {
           int index = petrinet.getPlaces().indexOf(place);
           int newValueOfPlace = newMue.get(index);
-          newMue.addAtIndex(index, 1);
+          newMue = newMue.addAtIndex(index, 1);
           if (place.getBoundedness() < newValueOfPlace) {
             place.setBoundedness(newValueOfPlace);
           }
@@ -175,7 +178,7 @@ public class CoverabilityGraph {
   }
 
   /**
-   * Implementation of 'setzeOmega' from Algorithm 1: uebGraph
+   * Implementation of 'setzeOmega' from Algorithm 1: uebGraph.
    *
    * @param mue  state of given markings
    * @param path path
@@ -202,7 +205,7 @@ public class CoverabilityGraph {
     }
     for (int s = 0; s < places.size(); s++) {
       if (omegas[s]) {
-        mue.setOmega(s);
+        mue = mue.setOmega(s);
         places.get(s).setBoundedness(-1);
       }
     }

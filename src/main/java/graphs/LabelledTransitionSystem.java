@@ -3,16 +3,19 @@ package graphs;
 import exception.WrongDimensionException;
 import graphs.objects.Vector;
 import graphs.objects.nodes.Transition;
-
 import java.util.ArrayList;
 import java.util.Optional;
 
+/**
+ * A sub-class of coverability-graph. It can only fire when the capacity is complied with the new
+ * marking.
+ */
 public class LabelledTransitionSystem extends CoverabilityGraph {
 
   private final Vector capacity;
 
   /**
-   * Constructor
+   * Constructor of a labelled-transition-system.
    *
    * @param mue0     marking at the beginning
    * @param name     name of the graph

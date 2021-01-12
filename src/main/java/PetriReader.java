@@ -7,7 +7,6 @@ import graphs.objects.Vector;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
-
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +31,12 @@ public class PetriReader {
   private static String pnString;
   private static String markingsString;
 
-  public static void main(String[] args) throws NotExistingNodeException {
+  /**
+   * Main method of petri-reader.
+   *
+   * @param args default arguments
+   */
+  public static void main(String[] args) {
     humanReadable = false;
     printPetriNet = true;
     printCoverabilityGraph = false;

@@ -2,25 +2,26 @@ package graphs.objects.nodes;
 
 import graphs.objects.Vector;
 import graphs.objects.edges.Edge;
-
 import java.util.List;
 
+/**
+ * Class for a place of a petrinet.
+ */
 public class Place extends Node {
 
+  private int capacity;
   // -1: not bounded; 0: undef; k: k-bounded
   private int boundedness;
-  private final int capacity;
 
+  /**
+   * Constructor to create a place with a specific label.
+   *
+   * @param label string to label the place
+   */
   public Place(String label) {
     super(label);
     this.boundedness = 0;
     this.capacity = -1;
-  }
-
-  public Place(String label, int capacity) {
-    super(label);
-    this.boundedness = 0;
-    this.capacity = capacity;
   }
 
   @Override
@@ -40,6 +41,9 @@ public class Place extends Node {
     this.setOutput(new Vector(arrOut));
   }
 
+  /**
+   * Increments the boundedness of this place.
+   */
   public void incrementBoundedness() {
     if (boundedness > -1) {
       boundedness++;
@@ -50,6 +54,11 @@ public class Place extends Node {
     return boundedness;
   }
 
+  /**
+   * Sets the boundedness to a value k.
+   *
+   * @param k an integer bigger equal 0 or -1 if the place is unbounded
+   */
   public void setBoundedness(int k) {
     if (k >= -1) {
       this.boundedness = k;
@@ -62,11 +71,16 @@ public class Place extends Node {
     return this.capacity;
   }
 
+  /**
+   * Sets the capacity to a value c.
+   *
+   * @param c an integer bigger equal 0 or -1 if the place has no capacity
+   */
   public void setCapacity(int c) {
     if (c >= -1) {
-      this.boundedness = c;
+      this.capacity = c;
     } else {
-      throw new IllegalArgumentException("A place cannot have a negative bounding.");
+      throw new IllegalArgumentException("A place cannot have a negative capacity.");
     }
   }
 

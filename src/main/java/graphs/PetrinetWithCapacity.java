@@ -20,6 +20,9 @@ public class PetrinetWithCapacity extends Petrinet {
       List<Edge> flow, Vector mue0, Vector capacity) {
     super(name, places, transitions, flow, mue0);
     this.capacity = capacity;
+    if (!checkCorrectness()) {
+      throw new IllegalArgumentException("This is no valid petrinet. The capacity is exceeded.");
+    }
   }
 
   public Vector getCapacity() {

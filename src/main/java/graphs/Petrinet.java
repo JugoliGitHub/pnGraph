@@ -5,7 +5,6 @@ import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Node;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,9 +42,11 @@ public class Petrinet {
     return this.mue0;
   }
 
-  //TODO: change vector mue 0
   //TODO  return new Petrinet with an extra place
-  public void addPlace(Place place) { places.add(place); }
+  //TODO: change vector mue 0
+  public void addPlace(Place place) {
+    places.add(place);
+  }
 
   public List<Place> getPlaces() {
     return places;
@@ -65,6 +66,10 @@ public class Petrinet {
 
   public List<Edge> getFlow() {
     return flow;
+  }
+
+  public Vector getParekhVector(Place s) {
+    return new Vector(places.size());
   }
 
   /**
@@ -177,6 +182,7 @@ public class Petrinet {
 
   /**
    * Checks whether two petrinets are same or not.
+   *
    * @param petrinet other petrinet
    * @return boolean if true
    */

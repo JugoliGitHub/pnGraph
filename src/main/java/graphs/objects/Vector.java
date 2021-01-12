@@ -1,54 +1,88 @@
 package graphs.objects;
 
 import exception.WrongDimensionException;
-
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+/**
+ * A vector class. These vectors can only have positive integers. -1 stands for infinite. Used for
+ * petrinets and corresponding classes.
+ */
 public class Vector {
 
-  private int[] vectorArray;
-  private int length;
+  private final int[] vectorArray;
+  private final int length;
 
   /**
-   * Constructors
+   * Creates a null vector of a specific length.
+   *
+   * @param length the length of the new vector
    */
   public Vector(int length) {
-    this.length = length;
-    vectorArray = new int[length];
+    this(length, 0);
   }
 
+  /**
+   * Creates a vector of a specific length with only one value.
+   *
+   * @param length the length of the new vector
+   * @param value  the value
+   */
   public Vector(int length, int value) {
-    this(length);
+    if (length <= 0) {
+      throw new IllegalArgumentException("The size must be at least 1.");
+    }
+    if (value < -1) {
+      throw new IllegalArgumentException("The value must be positive or -1 as omega.");
+    }
+    this.length = length;
+    this.vectorArray = new int[length];
     for (int i = 0; i < length; i++) {
       this.vectorArray[i] = value;
     }
   }
 
+  /**
+   * Creates a vector of a given array.
+   *
+   * @param array integer array
+   */
   public Vector(int[] array) {
     if (Arrays.stream(array).noneMatch(v -> v < -1)) {
       this.vectorArray = array;
       this.length = vectorArray.length;
+    } else {
+      throw new IllegalArgumentException("All values must be positive or -1 as omega.");
     }
-    //TODO: error
   }
 
+  /**
+   * Creates a vector of a vector string, returned of the toString() Method.
+   *
+   * @param vector the string of a vector: e.g. (1, 0)
+   */
   public Vector(String vector) {
     vector = vector.replace("(", "").replace(")", "");
     String[] valuesAsString = vector.split(", ");
     vectorArray = new int[valuesAsString.length];
+    this.length = valuesAsString.length;
     for (int i = 0; i < valuesAsString.length; i++) {
       String valueAsString = valuesAsString[i];
       if (Integer.parseInt(valueAsString) < -1) {
         throw new IllegalArgumentException("No negative values.");
       } else if (valueAsString.equals("ω") || valueAsString.equals("-1")) {
-        vectorArray[i] = Integer.parseInt(valueAsString);
+        vectorArray[i] = -1;
       } else {
         vectorArray[i] = Integer.parseInt(valueAsString);
       }
     }
   }
 
+  /**
+   * Creates a vector of a string array.
+   *
+   * @param markings string array
+   */
   public Vector(String[] markings) {
     this(Stream.of(markings).mapToInt(Integer::parseInt).toArray());
   }
@@ -58,11 +92,7 @@ public class Vector {
   }
 
   public int get(int i) {
-    if (i < length) {
-      return vectorArray[i];
-    } else {
-      throw new ArrayIndexOutOfBoundsException();
-    }
+    return vectorArray[i];
   }
 
   public int[] getVectorArray() {
@@ -156,50 +186,75 @@ public class Vector {
     }
     Vector temp = new Vector(vectorArray.clone());
     for (int i = 0; i < length; i++) {
-      if (!temp.subAtIndex(i, vector.get(i))) {
+      temp = temp.subAtIndex(i, vector.get(i));
+      if (temp.length == 0) {
         return new Vector(0);
       }
     }
     return temp;
   }
 
-  public boolean addAtIndex(int index, int value) {
-    if (index < vectorArray.length) {
-      if (vectorArray[index] != -1) {
-        if (value < 0) {
-          return false;
-        } else {
-          vectorArray[index] += value;
+  /**
+   * Returns a new vector with an added value at an index.
+   *
+   * @param index index bigger 0 and less than length of this vector
+   * @param value integer bigger 0
+   * @return the new vector or an empty vector
+   */
+  public Vector addAtIndex(int index, int value) {
+    if (index < vectorArray.length && index > 0) {
+      if (value < 0 || vectorArray[index] != -1) {
+        return new Vector(0);
+      } else {
+        int[] newArray = vectorArray.clone();
+        newArray[index] += value;
+        if (newArray[index] >= 0) {
+          return new Vector(newArray);
         }
       }
-      return true;
     }
-    return false;
+    return new Vector(0);
   }
 
-  //TODO: return Vector
-  public boolean subAtIndex(int index, int value) {
+  /**
+   * Returns a new vector with the subtracted value at an index.
+   *
+   * @param index index bigger 0 and less than length of this vector
+   * @param value integer bigger 0
+   * @return the new vector or an empty vector
+   */
+  public Vector subAtIndex(int index, int value) {
     if (index < vectorArray.length) {
       if (vectorArray[index] != -1) {
-        if (value < 0 || vectorArray[index] < value) {
-          return false;
+        int[] tmpArray = vectorArray.clone();
+        if (value < 0 || tmpArray[index] < value) {
+          return new Vector(0);
         } else {
-          vectorArray[index] -= value;
+          tmpArray[index] -= value;
         }
+        return new Vector(tmpArray);
       }
-      return true;
     }
-    return false;
+    return new Vector(0);
   }
 
-  public void setOmega(int index) {
+  /**
+   * Returns a new vector with a value of omega at index.
+   *
+   * @param index integer between 0 (included) and the length (exclueded)
+   * @return the new vector or an empty if operation not allowed
+   */
+  public Vector setOmega(int index) {
     if (index >= 0 && index < length) {
-      vectorArray[index] = -1;
+      int[] tmpVector = vectorArray.clone();
+      tmpVector[index] = -1;
+      return new Vector(tmpVector);
     }
+    return new Vector(0);
   }
 
   public Vector copy() {
-    return new Vector(vectorArray);
+    return new Vector(vectorArray.clone());
   }
 
   @Override
