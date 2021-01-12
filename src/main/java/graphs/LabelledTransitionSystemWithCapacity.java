@@ -10,7 +10,7 @@ import java.util.Optional;
  * A sub-class of coverability-graph. It can only fire when the capacity is complied with the new
  * marking.
  */
-public class LabelledTransitionSystem extends CoverabilityGraph {
+public class LabelledTransitionSystemWithCapacity extends CoverabilityGraph {
 
   private final Vector capacity;
 
@@ -21,7 +21,7 @@ public class LabelledTransitionSystem extends CoverabilityGraph {
    * @param name     name of the graph
    * @param petrinet corresponding petrinet
    */
-  public LabelledTransitionSystem(Vector mue0, String name, PetrinetWithCapacity petrinet)
+  public LabelledTransitionSystemWithCapacity(Vector mue0, String name, PetrinetWithCapacity petrinet)
       throws WrongDimensionException {
     super(mue0, name);
     this.petrinet = petrinet;

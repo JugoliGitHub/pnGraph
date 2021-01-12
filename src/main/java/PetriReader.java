@@ -51,6 +51,7 @@ public class PetriReader {
       System.out.println("Please add your pn-string or add -h for more help.");
       System.exit(0);
     }
+
     petrinet = createPetriNetAndMarkings(pnString, markingsString);
 
     CoverabilityGraph coverabilityGraph = new CoverabilityGraph(petrinet.getMue0(), nameCG,
@@ -104,26 +105,23 @@ public class PetriReader {
 
     String[] pnStringParts = pnString.split(";;");
     if (pnStringParts.length == 2) {
-      new Thread(() ->
-          Arrays.stream(pnStringParts[0].split(";"))
-              .map(x -> x.split(":"))
-              .map(PetriReader::createPlaceNodes)
-              .forEach(entry -> {
-                places.add(entry.getKey());
-                flow.addAll(entry.getValue());
-              })).start();
-      new Thread(() ->
-          Arrays.stream(pnStringParts[1].split(";"))
-              .map(x -> x.split(":"))
-              .map(PetriReader::createTransitionNodes)
-              .forEach(entry -> {
-                transitions.add(entry.getKey());
-                flow.addAll(entry.getValue());
-              })).start();
+      Arrays.stream(pnStringParts[0].split(";"))
+          .map(x -> x.split(":"))
+          .map(PetriReader::createPlaceNodes)
+          .forEach(entry -> {
+            places.add(entry.getKey());
+            flow.addAll(entry.getValue());
+          });
+      Arrays.stream(pnStringParts[1].split(";"))
+          .map(x -> x.split(":"))
+          .map(PetriReader::createTransitionNodes)
+          .forEach(entry -> {
+            transitions.add(entry.getKey());
+            flow.addAll(entry.getValue());
+          });
     } else {
       throw new IllegalArgumentException("The pn-string needs the right format.");
     }
-
     return new Petrinet(namePN, places, transitions, flow, mue0);
   }
 

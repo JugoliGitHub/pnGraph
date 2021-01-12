@@ -1,9 +1,6 @@
+import graphs.CoverabilityGraph;
 import graphs.Petrinet;
 import graphs.objects.Vector;
-import graphs.objects.edges.Edge;
-import graphs.objects.nodes.Place;
-import graphs.objects.nodes.Transition;
-import java.util.List;
 
 /**
  * This class is for quick testing inside my IDE.
@@ -39,19 +36,18 @@ public class Playground {
     List<Edge> flow = fl.stream().map(Edge::reverse).collect(Collectors.toList());
     System.out.println(flow.toString());
     System.out.println(fl.toString()); */
+    try {
+      Petrinet p = PetriReader
+        .createPetriNetAndMarkings("s1:a,b;s2:c;s3:d;;a:s2;b:s3;c:s2,s3;d:s2;;", "1,0,0");
 
-    Place p1 = new Place("1");
-    Place p2 = new Place("2");
-    Transition t1 = new Transition("t1");
-    Petrinet petri1 = new Petrinet("",
-        List.of(p1, p2),
-        List.of(t1),
-        List.of(new Edge(p1, t1), new Edge(t1, p2)),
-        new Vector(new int[]{1, 0}));
+      System.out.println(p.toString());
 
-    System.out.println(petri1);
-    System.out.println(petri1.reversed());
-    System.out.println(petri1.dual());
+      CoverabilityGraph c = new CoverabilityGraph(new Vector(new int[]{1,0,0}), "", p);
+      System.out.println(c.toString());
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
   }
 
 }

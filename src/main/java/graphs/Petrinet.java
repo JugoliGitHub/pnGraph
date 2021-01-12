@@ -30,7 +30,7 @@ public class Petrinet {
     this.transitions = transitions;
     this.flow = flow;
     this.mue0 = mue0;
-    if (!checkCorrectness()) {
+    if (!isCorrect()) {
       throw new IllegalArgumentException("This is no valid petrinet");
     }
     setVectors();
@@ -83,7 +83,7 @@ public class Petrinet {
   }
 
   /**
-   * Initializes every node with the boundedness of the initial marking mue_0.
+   * Initializes every node with the boundedness of the initial marking mue0.
    */
   protected void setInitialBoundedness() {
     for (int i = 0; i < places.size(); i++) {
@@ -91,14 +91,36 @@ public class Petrinet {
     }
   }
 
-  protected boolean checkCorrectness() {
-    // TODO: check correctness
-    // throw exceptions and kill user D:
-    return isSameLength();
+  /**
+   * A petrinet is correct if: * places and transitions are finite, linearly ordered, t contains
+   * at least one element and the net is connected.
+   *
+   * @return true, when this net is correct
+   */
+  protected boolean isCorrect() {
+    return isSameLength()
+        && transitions.size() > 0
+        && isConnected();
   }
 
   private boolean isSameLength() {
     return mue0.getLength() == places.size();
+  }
+
+  private boolean isConnected() {
+    return transitions.stream()
+        .filter(transition ->
+            (int) flow.stream()
+                .filter(edge -> edge.getFrom().equals(transition)
+                    || edge.getTo().equals(transition))
+                .count() > 1)
+        .count() == transitions.size()
+        && places.stream()
+        .filter(place ->
+            (int) flow.stream()
+                .filter(edge -> edge.getFrom().equals(place) || edge.getTo().equals(place))
+                .count() > 1)
+        .count() == places.size();
   }
 
   public boolean containsLoop() {

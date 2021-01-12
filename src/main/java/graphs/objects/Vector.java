@@ -111,14 +111,10 @@ public class Vector {
    */
   public boolean lessThan(Vector vector) {
     if (length == vector.getLength() && !this.equals(vector)) {
-      for (int i = 0; i < length; i++) {
-        int thisInt = this.vectorArray[i];
-        int thatInt = vector.get(i);
-        if (thatInt != -1 && thisInt != -1 && thisInt >= thatInt) {
-          return false;
-        }
+      if (this.equals(vector)) {
+        return false;
       }
-      return true;
+      return isLessThan(vector);
     }
     return false;
   }
@@ -134,16 +130,67 @@ public class Vector {
       if (this.equals(vector)) {
         return true;
       }
+      return isLessThan(vector);
+    }
+    return false;
+  }
+
+  /**
+   * Compares this vector to the given parameter.
+   *
+   * @param vector to compare to
+   * @return true when this vector is strictly less than the other
+   */
+  public boolean strictlyLessThan(Vector vector) {
+    if (length == vector.getLength()) {
       for (int i = 0; i < length; i++) {
         int thisInt = this.vectorArray[i];
         int thatInt = vector.get(i);
-        if (thatInt != -1 && thisInt != -1 && thisInt > thatInt) {
+        if (!(thisInt < thatInt) || thatInt == -1 || thisInt == -1) {
           return false;
         }
       }
       return true;
     }
     return false;
+  }
+
+  private boolean isLessThan(Vector vector) {
+    for (int i = 0; i < length; i++) {
+      int thisInt = this.vectorArray[i];
+      int thatInt = vector.get(i);
+      if (!(thisInt <= thatInt) && thatInt != -1 && thisInt != -1) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Checks if this vector is not negative.
+   *
+   * @return true, when this is not negative
+   */
+  public boolean isNotNegative() {
+    return new Vector(length).lessEquals(this);
+  }
+
+  /**
+   * Checks if this vector is semi-positive.
+   *
+   * @return true, when this is semi-positive
+   */
+  public boolean isSemiPositive() {
+    return new Vector(length).lessThan(this);
+  }
+
+  /**
+   * Checks if this vector is strictly positive.
+   *
+   * @return true, when this is strictly positive
+   */
+  public boolean isStrictlyPositive() {
+    return new Vector(length).strictlyLessThan(this);
   }
 
   /**
@@ -165,7 +212,7 @@ public class Vector {
         } else if (vector.get(i) == -1) {
           temp.vectorArray[i] = -1;
         } else {
-          throw new IllegalArgumentException("Can´t add with omega or negative values.");
+          throw new IllegalArgumentException("Can´t add with negative values.");
         }
       }
       return temp;
@@ -225,15 +272,15 @@ public class Vector {
    */
   public Vector subAtIndex(int index, int value) {
     if (index < vectorArray.length) {
+      int[] tmpArray = vectorArray.clone();
       if (vectorArray[index] != -1) {
-        int[] tmpArray = vectorArray.clone();
         if (value < 0 || tmpArray[index] < value) {
           return new Vector(0);
         } else {
           tmpArray[index] -= value;
         }
-        return new Vector(tmpArray);
       }
+      return new Vector(tmpArray);
     }
     return new Vector(0);
   }

@@ -4,9 +4,12 @@ import graphs.objects.Vector;
 import graphs.objects.edges.Edge;
 import java.util.List;
 
+/**
+ * A node class for nodes of a petrinet.
+ */
 public abstract class Node {
 
-  protected String label;
+  protected final String label;
   protected Vector input;
   protected Vector output;
 
@@ -23,7 +26,7 @@ public abstract class Node {
   }
 
   /**
-   * Sets the input and output vectors.
+   * Sets the input and output vectors to a corresponding petrinet.
    *
    * @param flow       flow of the petrinet
    * @param otherNodes nodes of other type from the petrinet
@@ -35,7 +38,7 @@ public abstract class Node {
     return input;
   }
 
-  public void setInput(Vector input) {
+  protected void setInput(Vector input) {
     this.input = input;
   }
 
@@ -43,7 +46,7 @@ public abstract class Node {
     return output;
   }
 
-  public void setOutput(Vector output) {
+  protected void setOutput(Vector output) {
     this.output = output;
   }
 
