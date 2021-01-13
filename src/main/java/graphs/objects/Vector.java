@@ -305,6 +305,23 @@ public class Vector {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Vector)) {
+      return false;
+    }
+
+    Vector vector = (Vector) o;
+
+    if (length != vector.length) {
+      return false;
+    }
+    return Arrays.equals(vectorArray, vector.vectorArray);
+  }
+
+  @Override
   public String toString() {
     StringBuilder toReturn = new StringBuilder("(");
     Arrays.stream(vectorArray).forEach(value -> {
