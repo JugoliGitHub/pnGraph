@@ -36,18 +36,13 @@ public class Playground {
     List<Edge> flow = fl.stream().map(Edge::reverse).collect(Collectors.toList());
     System.out.println(flow.toString());
     System.out.println(fl.toString()); */
-    try {
-      Petrinet p = PetriReader
+    Petrinet p = PetriReader
         .createPetriNetAndMarkings("s1:a,b;s2:c;s3:d;;a:s2;b:s3;c:s2,s3;d:s2;;", "1,0,0");
 
-      System.out.println(p.toString());
+    System.out.println(p.toString());
 
-      CoverabilityGraph c = new CoverabilityGraph(new Vector(new int[]{1,0,0}), "", p);
-      System.out.println(c.toString());
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-
+    CoverabilityGraph c = new CoverabilityGraph(new Vector(new int[]{1, 0, 0}), "", p);
+    System.out.println(c.toString());
   }
 
 }
