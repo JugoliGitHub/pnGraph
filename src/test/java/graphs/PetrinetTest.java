@@ -1,6 +1,7 @@
 package graphs;//import static org.hamcrest.MatcherAssert.assertThat;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import graphs.objects.Vector;
 import graphs.objects.edges.Edge;
@@ -18,12 +19,16 @@ import org.mockito.Mockito;
  */
 public class PetrinetTest {
 
+  @Mock
+  Place place1;
+  @Mock
+  Transition transition1;
+  @Mock
+  Vector mue0;
   List<Place> places;
   List<Transition> transitions;
-  @Mock Place place1;
-  @Mock Transition transition1;
-  @Mock Vector mue0;
-  @Mock List<Edge> flow;
+  List<Edge> flow;
+
   Petrinet pn;
 
   @BeforeEach
@@ -35,11 +40,12 @@ public class PetrinetTest {
     places.add(place1);
     transitions.add(transition1);
     mue0 = Mockito.mock(Vector.class);
-    flow = Mockito.mock(List.class);
+    flow = new ArrayList<>();
+    flow.add(new Edge(place1, transition1));
   }
 
   @Test
-  void createNetThrowsException() {
+  void createNetWithWrongMue0ThrowsException() {
     Mockito.when(mue0.getLength()).thenReturn(0);
 
     try {
@@ -50,23 +56,86 @@ public class PetrinetTest {
   }
 
   @Test
-  void createCorrectPetrinetWorks() {
-    Mockito.doNothing().when(place1).setVectors(Mockito.isA(List.class), Mockito.isA(List.class),
-        Mockito.isA(Integer.class));
-    Mockito.doNothing().when(transition1).setVectors(Mockito.isA(List.class), Mockito.isA(List.class),
-        Mockito.isA(Integer.class));
+  void createNetWithNoTransitionsThrowsException() {
     Mockito.when(mue0.getLength()).thenReturn(1);
+    transitions.remove(transition1);
+
+    //check other options, so only the one is not correct
+    assertEquals(mue0.getLength(), places.size());
+
+    try {
+      pn = new Petrinet("petrinet", places, transitions, flow, mue0);
+    } catch (RuntimeException e) {
+      assertEquals(e.getMessage(), "This is no valid petrinet");
+    }
+  }
+
+  @Test
+  void createNetWithNoConnectionThrowsException() {
+    Mockito.when(mue0.getLength()).thenReturn(1);
+    flow.remove(0);
+
+    //check other options, so only the one is not correct
+    assertTrue(transitions.size() > 0 && mue0.getLength() == places.size());
+
+    try {
+      pn = new Petrinet("petrinet", places, transitions, flow, mue0);
+    } catch (RuntimeException e) {
+      assertEquals(e.getMessage(), "This is no valid petrinet");
+    }
+  }
+
+
+  @Test
+  void createCorrectPetrinetWorks() {
+    //TODO: why does it not work with mocks???
+    place1 = new Place("s1");
+    transition1 = new Transition("t1");
+    places = List.of(place1);
+    transitions = List.of(transition1);
+    mue0 = new Vector(new int[]{1});
+    flow = List.of(new Edge(place1, transition1));
 
     pn = new Petrinet("petrinet", places, transitions, flow, mue0);
 
-    // set vectors check
+    assertEquals(pn.getMue0(), mue0);
+    assertEquals(pn.getPlaces().get(0), place1);
+    assertEquals(pn.getTransitions().get(0), transition1);
+    assertEquals(pn.getBoundedness(), 1);
+    assertEquals(pn.getLiveness(), -1);
+    /*// set vectors check
     Mockito.verify(place1, Mockito.times(1)).setVectors(Mockito.any(), Mockito.any(),
         Mockito.any(Integer.class));
     Mockito.verify(transition1, Mockito.times(1)).setVectors(Mockito.any(), Mockito.any(),
         Mockito.any(Integer.class));
 
     // set initial boundedness check
-    Mockito.verify(place1, Mockito.times(1)).setBoundedness(Mockito.anyInt());
+    Mockito.verify(place1, Mockito.times(1)).setBoundedness(Mockito.anyInt()); */
+  }
+
+  @Test
+  void createReversedPetrinetWorks() {
+    place1 = new Place("s1");
+    transition1 = new Transition("t1");
+    places = List.of(place1);
+    transitions = List.of(transition1);
+    mue0 = new Vector(new int[]{1});
+    flow = List.of(new Edge(place1, transition1));
+
+    pn = new Petrinet("petrinet", places, transitions, flow, mue0).reversed();
+
+    assertEquals(pn.getMue0(), mue0);
+    assertEquals(pn.getPlaces().get(0), place1);
+    assertEquals(pn.getTransitions().get(0), transition1);
+    assertEquals(pn.getBoundedness(), 1);
+    assertEquals(pn.getLiveness(), -1);
+    assertEquals(pn.getFlow().size(), 1);
+    assertEquals(pn.getFlow().get(0), new Edge<>(transition1, place1));
+  }
+
+  @Test
+  void createDualPetrinetWorks() {
+
   }
 
 }

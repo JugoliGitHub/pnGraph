@@ -18,7 +18,7 @@ public class Transition extends Node {
    */
   public Transition(String label) {
     super(label);
-    liveness = 0;
+    liveness = -1;
   }
 
   @Override

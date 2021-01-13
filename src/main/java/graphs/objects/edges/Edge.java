@@ -1,6 +1,7 @@
 package graphs.objects.edges;
 
 import graphs.objects.nodes.Node;
+import java.util.Objects;
 
 public class Edge<K extends Node, V extends Node> {
 
@@ -27,6 +28,23 @@ public class Edge<K extends Node, V extends Node> {
   @Override
   public String toString() {
     return "  \"" + from.toString() + "\" -> \"" + to.toString() + "\";\n";
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Edge)) {
+      return false;
+    }
+
+    Edge<?, ?> edge = (Edge<?, ?>) o;
+
+    if (!Objects.equals(from, edge.from)) {
+      return false;
+    }
+    return Objects.equals(to, edge.to);
   }
 
 }

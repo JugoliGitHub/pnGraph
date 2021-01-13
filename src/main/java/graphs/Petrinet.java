@@ -18,7 +18,7 @@ public class Petrinet {
   protected final Vector mue0;
 
   /**
-   * Creates an empty petrinet. Should initialize mue_0, capacity (if present) and places,
+   * Creates an empty petrinet. Should initialize mue0, capacity (if present) and places,
    * transitions and flow.
    *
    * @param name name of the net
@@ -92,8 +92,8 @@ public class Petrinet {
   }
 
   /**
-   * A petrinet is correct if: * places and transitions are finite, linearly ordered, t contains
-   * at least one element and the net is connected.
+   * A petrinet is correct if: * places and transitions are finite, linearly ordered, t contains at
+   * least one element and the net is connected.
    *
    * @return true, when this net is correct
    */
@@ -109,15 +109,15 @@ public class Petrinet {
     return transitions.stream()
         .filter(transition ->
             (int) flow.stream()
-                .filter(edge -> edge.getFrom().equals(transition)
-                    || edge.getTo().equals(transition))
-                .count() > 1)
+                .filter(
+                    edge -> edge.getFrom().equals(transition) || edge.getTo().equals(transition))
+                .count() >= 1)
         .count() == transitions.size()
         && places.stream()
         .filter(place ->
             (int) flow.stream()
                 .filter(edge -> edge.getFrom().equals(place) || edge.getTo().equals(place))
-                .count() > 1)
+                .count() >= 1)
         .count() == places.size();
   }
 
