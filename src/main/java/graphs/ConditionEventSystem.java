@@ -24,7 +24,7 @@ class ConditionEventSystem extends PetrinetWithCapacity {
   public ConditionEventSystem(String name, List<Place> conditions, List<Transition> events,
       List<Edge> flow, Vector mue0) {
     super(name, conditions, events, flow, mue0, new Vector(mue0.getLength(), 1));
-    if (!isCorrect()) {
+    if (!isNotCorrect()) {
       throw new IllegalArgumentException(
           "This is no valid condition-event-system."
               + " The capacity of 1 is exceeded or a rule is broken.");
@@ -32,7 +32,7 @@ class ConditionEventSystem extends PetrinetWithCapacity {
   }
 
   @Override
-  protected boolean isCorrect() {
+  protected boolean isNotCorrect() {
     //TODO: no loops, multiple edges
     return true;
   }

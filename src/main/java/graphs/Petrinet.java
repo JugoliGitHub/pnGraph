@@ -30,7 +30,7 @@ public class Petrinet {
     this.transitions = transitions;
     this.flow = flow;
     this.mue0 = mue0;
-    if (!isCorrect()) {
+    if (isNotCorrect()) {
       throw new IllegalArgumentException("This is no valid petrinet");
     }
     setVectors();
@@ -97,10 +97,8 @@ public class Petrinet {
    *
    * @return true, when this net is correct
    */
-  protected boolean isCorrect() {
-    return isSameLength()
-        && transitions.size() > 0
-        && isConnected();
+  protected boolean isNotCorrect() {
+    return !isSameLength() || !(transitions.size() > 0) || !isConnected();
   }
 
   private boolean isSameLength() {
