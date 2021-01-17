@@ -37,8 +37,8 @@ public class Place extends Node {
         arrOut[to.indexIn(transitions)] += 1;
       }
     });
-    this.setInput(new Vector(arrIn));
-    this.setOutput(new Vector(arrOut));
+    this.setPreSet(new Vector(arrIn));
+    this.setPostSet(new Vector(arrOut));
   }
 
   /**
@@ -84,4 +84,8 @@ public class Place extends Node {
     }
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj);
+  }
 }

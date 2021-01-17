@@ -6,7 +6,11 @@ import graphs.objects.nodes.Node;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Petrinet {
@@ -16,6 +20,8 @@ public class Petrinet {
   protected final List<Transition> transitions;
   protected final List<Edge> flow;
   protected final Vector mue0;
+
+  protected final Map<Place, Set<Place>> pathsFromPlace;
 
   /**
    * Creates an empty petrinet. Should initialize mue0, capacity (if present) and places,
@@ -30,11 +36,13 @@ public class Petrinet {
     this.transitions = transitions;
     this.flow = flow;
     this.mue0 = mue0;
+    pathsFromPlace = new HashMap<>();
     if (isNotCorrect()) {
       throw new IllegalArgumentException("This is no valid petrinet");
     }
     setVectors();
     setInitialBoundedness();
+    setPaths();
   }
 
   public Vector getMue0() {
@@ -67,10 +75,6 @@ public class Petrinet {
     return flow;
   }
 
-  public Vector getParekhVector(Place s) {
-    return new Vector(places.size());
-  }
-
   /**
    * Sets the start- and end-nodes for every node.
    */
@@ -92,7 +96,7 @@ public class Petrinet {
   }
 
   /**
-   * A petrinet is correct if: * places and transitions are finite, linearly ordered, t contains at
+   * A petrinet is correct if: places and transitions are finite, linearly ordered, t contains at
    * least one element and the net is connected.
    *
    * @return true, when this net is correct
@@ -119,6 +123,16 @@ public class Petrinet {
                 .filter(edge -> edge.getFrom().equals(place) || edge.getTo().equals(place))
                 .count() >= 1)
         .count() == places.size();
+  }
+
+  public boolean isStronglyConnected() {
+    return places.stream().allMatch(this::isConnectedToEveryPlace);
+  }
+
+  private boolean isConnectedToEveryPlace(Place place) {
+    return
+        places.stream().filter(p -> pathsFromPlace.get(place).stream().anyMatch(p::equals)).count()
+            == places.size();
   }
 
   public boolean containsLoop() {

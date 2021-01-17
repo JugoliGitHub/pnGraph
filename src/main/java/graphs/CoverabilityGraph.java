@@ -104,7 +104,7 @@ public class CoverabilityGraph {
       throws WrongDimensionException {
     Vector newMue = new Vector(mue.getLength());
     newMue = newMue.add(mue);
-    if (transition.getOutput().getLength() == 0 || transition.getInput().getLength() == 0) {
+    if (transition.getPostSet().getLength() == 0 || transition.getPreSet().getLength() == 0) {
       if (petrinet.getTransitions().contains(transition)) {
         List<Place> frontPlaces = new ArrayList<>();
         List<Place> endPlaces = new ArrayList<>();
@@ -138,8 +138,8 @@ public class CoverabilityGraph {
           }
         }
       }
-    } else if (!newMue.sub(transition.getInput()).equals(new Vector(0))) {
-      newMue = newMue.sub(transition.getInput()).add(transition.getOutput());
+    } else if (!newMue.sub(transition.getPreSet()).equals(new Vector(0))) {
+      newMue = newMue.sub(transition.getPreSet()).add(transition.getPostSet());
       setBoundednessOfPlaces(mue, newMue);
     } else {
       return Optional.empty();

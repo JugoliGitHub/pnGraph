@@ -37,12 +37,12 @@ public class LabelledTransitionSystemWithCapacity extends CoverabilityGraph {
       throws WrongDimensionException {
     Vector newMue = new Vector(mue.getLength());
     newMue = newMue.add(mue);
-    if (transition.getOutput().getLength() == 0 || transition.getInput().getLength() == 0) {
+    if (transition.getPostSet().getLength() == 0 || transition.getPreSet().getLength() == 0) {
       throw new IllegalArgumentException("Initialize in- and output first.");
-    } else if (transition.getInput().lessEquals(mue)
-        && newMue.sub(transition.getInput()).add(transition.getOutput())
+    } else if (transition.getPreSet().lessEquals(mue)
+        && newMue.sub(transition.getPreSet()).add(transition.getPostSet())
         .lessEquals(capacity)) {
-      newMue = newMue.sub(transition.getInput()).add(transition.getOutput());
+      newMue = newMue.sub(transition.getPreSet()).add(transition.getPostSet());
       setBoundednessOfPlaces(mue, newMue);
     } else {
       return Optional.empty();

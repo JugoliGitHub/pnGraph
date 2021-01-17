@@ -10,19 +10,19 @@ import java.util.List;
 public abstract class Node {
 
   protected final String label;
-  protected Vector input;
-  protected Vector output;
+  protected Vector preSet;
+  protected Vector postSet;
 
   protected Node(String label) {
     this.label = label;
-    this.input = new Vector(0);
-    this.output = new Vector(0);
+    this.preSet = new Vector(0);
+    this.postSet = new Vector(0);
   }
 
   protected Node(String label, int size) {
     this.label = label;
-    this.input = new Vector(size);
-    this.output = new Vector(size);
+    this.preSet = new Vector(size);
+    this.postSet = new Vector(size);
   }
 
   /**
@@ -34,20 +34,20 @@ public abstract class Node {
    */
   public abstract void setVectors(List<Edge> flow, List<? extends Node> otherNodes, int dimension);
 
-  public Vector getInput() {
-    return input;
+  public Vector getPreSet() {
+    return preSet;
   }
 
-  protected void setInput(Vector input) {
-    this.input = input;
+  protected void setPreSet(Vector preSet) {
+    this.preSet = preSet;
   }
 
-  public Vector getOutput() {
-    return output;
+  public Vector getPostSet() {
+    return postSet;
   }
 
-  protected void setOutput(Vector output) {
-    this.output = output;
+  protected void setPostSet(Vector postSet) {
+    this.postSet = postSet;
   }
 
   public String getLabel() {

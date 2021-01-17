@@ -34,8 +34,8 @@ public class Transition extends Node {
         arrOut[to.indexIn(places)] += 1;
       }
     });
-    this.setInput(new Vector(arrIn));
-    this.setOutput(new Vector(arrOut));
+    this.setPreSet(new Vector(arrIn));
+    this.setPostSet(new Vector(arrOut));
   }
 
   /**
