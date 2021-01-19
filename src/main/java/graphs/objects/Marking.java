@@ -123,8 +123,8 @@ public class Marking {
   }
 
   /**
-   * Compares two markings of less-/equality. Two markings are smaller than/ equal, when their length is equal
-   * and for every pair of numbers a, b applies: a <= b.
+   * Compares two markings of less-/equality. Two markings are smaller than/ equal, when their
+   * length is equal and for every pair of numbers a, b applies: a <= b.
    *
    * @param marking to compare to
    * @return true when this vector is less/equal than the other
@@ -137,8 +137,8 @@ public class Marking {
   }
 
   /**
-   * Compares two markings. Two markings are equal, when their length is equal
-   *    * and for every pair of numbers a, b applies: a <= b.
+   * Compares two markings. Two markings are equal, when their length is equal * and for every pair
+   * of numbers a, b applies: a <= b.
    *
    * @param marking to compare to
    * @return true when this vector is less than the other
@@ -198,19 +198,14 @@ public class Marking {
    *
    * @param marking additional vector
    */
-  public Marking add(Marking marking) throws WrongDimensionException {
+  public Marking add(Marking marking) {
     if (marking.length == length) {
       Marking result = new Marking(vectorArray.clone());
       for (int i = 0; i < length; i++) {
-        if (result.vectorArray[i] == -1) {
-          continue;
-        }
-        if (marking.get(i) >= 0) {
-          if (result.vectorArray[i] >= 0) {
-            result.vectorArray[i] += marking.get(i);
-          }
-        } else if (marking.get(i) == -1) {
+        if (result.vectorArray[i] == -1 || marking.get(i) == -1) {
           result.vectorArray[i] = -1;
+        } else if (marking.get(i) >= 0 && result.vectorArray[i] >= 0) {
+          result.vectorArray[i] += marking.get(i);
         } else {
           throw new IllegalArgumentException("Can´t add with negative values.");
         }
