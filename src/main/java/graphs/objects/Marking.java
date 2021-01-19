@@ -130,22 +130,10 @@ public class Marking {
    * @return true when this vector is less/equal than the other
    */
   public boolean lessEquals(Marking marking) {
-    if (length == marking.getLength()) {
-      for (int i = 0; i < length; i++) {
-        if (this.get(i) == -1 && marking.get(i) != -1) {
-          return false;
-        }
-        if (this.get(i) != -1 && marking.get(i) == -1) {
-          break;
-        }
-        if (this.get(i) != -1 && this.get(i) > marking.get(i)) {
-          return false;
-        }
-
-      }
-      return true;
-    }
-    return false;
+    return length == marking.getLength()
+        && IntStream.range(0, length)
+        .noneMatch(i -> marking.get(i) != -1
+            && (this.get(i) == -1 || !(this.get(i) <= marking.get(i))));
   }
 
   /**
@@ -156,13 +144,7 @@ public class Marking {
    * @return true when this vector is less than the other
    */
   public boolean lessThan(Marking marking) {
-    if (length == marking.getLength() && !this.equals(marking)) {
-      if (this.equals(marking)) {
-        return false;
-      }
-      return lessEquals(marking);
-    }
-    return false;
+    return length == marking.getLength() && !this.equals(marking) && this.lessEquals(marking);
   }
 
   /**
@@ -174,9 +156,8 @@ public class Marking {
   public boolean strictlyLessThan(Marking marking) {
     if (length == marking.getLength()) {
       for (int i = 0; i < length; i++) {
-        int thisInt = this.vectorArray[i];
         int thatInt = marking.get(i);
-        if (!(thisInt < thatInt) || thatInt == -1) {
+        if (!(this.vectorArray[i] < thatInt) || thatInt == -1) {
           return false;
         }
       }
