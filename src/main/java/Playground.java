@@ -1,6 +1,4 @@
 import graphs.Petrinet;
-import graphs.objects.Marking;
-import java.util.List;
 
 /**
  * This class is for quick testing inside my IDE.
@@ -50,12 +48,6 @@ public class Playground {
     System.out.println(p.toString());
 
     System.out.println(p.createCoverabilityGraph().toString());
-
-    List<Marking> path = List.of(new Marking(new int[]{0,1,-1}), new Marking(new int[]{1, -1,-1}));
-    Marking mue = new Marking(new int[]{0,2,-1});
-    System.out.println(path.stream()
-        .filter(waypoint -> waypoint.lessThan(mue))
-        .reduce(mue, Marking::setOmegas));
   }
 
 }

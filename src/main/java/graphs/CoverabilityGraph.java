@@ -166,7 +166,8 @@ public class CoverabilityGraph {
     for (Transition transition : petrinet.getTransitions()) {
       Optional<Marking> newMueOptional = fire(mue, transition);
       if (newMueOptional.isPresent()) {
-        Marking newMue = setOmega(newMueOptional.get(), path);
+        Marking newMue = newMueOptional.get();
+        setOmega(newMue, path);
         if (newMue.containsOmega()) {
           transition.setLiveness(1);
         }
@@ -181,10 +182,10 @@ public class CoverabilityGraph {
     }
   }
 
-  private static Marking setOmega(Marking mue, List<Marking> path) {
-    return path.stream()
+  private static void setOmega(Marking mue, List<Marking> path) {
+    path.stream()
         .filter(waypoint -> waypoint.lessThan(mue))
-        .reduce(mue, Marking::setOmegas);
+        .forEach(mue::setOmegas);
   }
 
   /**

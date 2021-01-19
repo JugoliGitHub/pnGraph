@@ -103,18 +103,16 @@ public class Marking {
     return Arrays.stream(vectorArray).anyMatch(i -> i == -1);
   }
 
-  public static Marking setOmegas(Marking mue, Marking waypoint) {
-    if (mue.getLength() == waypoint.getLength()) {
-      for (int i = 0; i < mue.getLength(); i++) {
-        if (mue.get(i) == -1) {
-          mue = mue.setOmega(i);
-        } else if (waypoint.get(i) != -1 && waypoint.get(i) < mue.get(i)) {
-          mue = mue.setOmega(i);
+  public void setOmegas(Marking waypoint) {
+    if (this.getLength() == waypoint.getLength()) {
+      for (int i = 0; i < this.getLength(); i++) {
+        if (this.get(i) == -1) {
+          vectorArray[i] = -1;
+        } else if (waypoint.get(i) != -1 && waypoint.get(i) < vectorArray[i]) {
+          vectorArray[i] = -1;
         }
       }
-      return mue;
     }
-    return new Marking(0);
   }
 
   /**
