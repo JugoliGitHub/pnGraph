@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -12,9 +13,21 @@ import org.junit.jupiter.api.Test;
 public class MarkingTest {
 
   Marking marking;
+  Marking marking1;
+  Marking marking2;
+  Marking marking3;
+  Marking marking4;
+
+  @BeforeEach
+  void prepare() {
+    marking1 = new Marking(new int[]{1, 2, 3});
+    marking2 = new Marking(new int[]{-1, 4, 3});
+    marking3 = new Marking(new int[]{-1, 2});
+    marking4 = new Marking(new int[]{2, -1});
+  }
 
   @Test
-  void createVectorWithNoLengthFails() {
+  void createMarkingWithNoLengthFails() {
     try {
       marking = new Marking(0);
     } catch (IllegalArgumentException e) {
@@ -23,7 +36,7 @@ public class MarkingTest {
   }
 
   @Test
-  void createVectorWithNegativeLengthFails() {
+  void createMarkingWithNegativeLengthFails() {
     try {
       marking = new Marking(-1);
     } catch (IllegalArgumentException e) {
@@ -32,7 +45,7 @@ public class MarkingTest {
   }
 
   @Test
-  void createVectorWithNegativeValueFails() {
+  void createMarkingWithNegativeValueFails() {
     try {
       marking = new Marking(1, -2);
     } catch (IllegalArgumentException e) {
@@ -41,7 +54,7 @@ public class MarkingTest {
   }
 
   @Test
-  void createVectorWithOneValueWorks() {
+  void createMarkingWithOneValueWorks() {
     marking = new Marking(2, 0);
 
     assertEquals(marking.getLength(), 2);
@@ -50,7 +63,7 @@ public class MarkingTest {
   }
 
   @Test
-  void createNullVectorWorks() {
+  void createNullMarkingWorks() {
     marking = new Marking(1);
 
     assertEquals(marking.getLength(), 1);
@@ -58,7 +71,7 @@ public class MarkingTest {
   }
 
   @Test
-  void createVectorWithArrayNegativeValuesFails() {
+  void createMarkingWithArrayNegativeValuesFails() {
     try {
       marking = new Marking(new int[]{0, 1, -1, -2});
     } catch (IllegalArgumentException e) {
@@ -67,7 +80,7 @@ public class MarkingTest {
   }
 
   @Test
-  void createVectorWithArrayWorks() {
+  void createMarkingWithArrayWorks() {
     marking = new Marking(new int[]{0, 1, -1, 2});
 
     assertEquals(marking.getLength(), 4);
@@ -79,24 +92,117 @@ public class MarkingTest {
 
   //other constructors
 
+  //===== containsOmega() Tests =====//
   @Test
   void containsOmegaWorks() {
-    Marking markingWithoutOmega = new Marking(new int[]{1, 2, 3});
-    Marking marking = new Marking(new int[]{1, 2, -1});
+    assertFalse(marking1.containsOmega());
+    assertTrue(marking2.containsOmega());
+  }
 
-    assertFalse(markingWithoutOmega.containsOmega());
-    assertTrue(marking.containsOmega());
+  //===== lessEquals() Tests =====//
+  @Test
+  void lessEqualsWorksWithSameVector() {
+    assertTrue(marking1.lessEquals(marking1.copy()));
   }
 
   @Test
-  void lessThanWorks() {
-
+  void lessEqualsWorksWithTwoVectors() {
+    assertTrue(marking1.lessEquals(marking2));
+    assertFalse(marking2.lessEquals(marking1));
   }
 
   @Test
-  void lessEqualsWorks() {
-
+  void lessEqualsWorksNotWithTwoOmegasAtDifferentPositions() {
+    assertFalse(marking4.lessEquals(marking3));
+    assertFalse(marking3.lessEquals(marking4));
   }
 
-  //TODO: sub and add methods only changing new vector not the old
+  @Test
+  void lessEqualsWorksNotWithDifferentSize() {
+    assertFalse(marking1.lessEquals(marking3));
+  }
+
+  //===== lessThan() Tests =====//
+  @Test
+  void lessThanWorksNotWithSameVector() {
+    assertFalse(marking1.lessThan(marking1.copy()));
+  }
+
+  @Test
+  void lessThanWorksWithTwoVectors() {
+    assertTrue(marking1.lessThan(marking2));
+    assertFalse(marking2.lessThan(marking1));
+  }
+
+  @Test
+  void lessThanWorksNotWithTwoOmegasAtDifferentPositions() {
+    assertFalse(marking4.lessThan(marking3));
+    assertFalse(marking3.lessThan(marking4));
+  }
+
+  @Test
+  void lessThanWorksNotWithDifferentSize() {
+    assertFalse(marking1.lessThan(marking3));
+  }
+
+  //===== strictlyLessThan() Tests =====//
+  @Test
+  void strictlyLessThanWorksNotWithSameVector() {
+    assertFalse(marking1.strictlyLessThan(marking1.copy()));
+  }
+
+  @Test
+  void strictlyLessThanWorksWithTwoVectors() {
+    marking = new Marking(new int[]{2, 3, 4});
+
+    assertTrue(marking1.strictlyLessThan(marking));
+    assertFalse(marking1.strictlyLessThan(marking2));
+    assertFalse(marking2.strictlyLessThan(marking1));
+  }
+
+  @Test
+  void strictlyLessThanWorksNotWithTwoOmegasAtDifferentPositions() {
+    assertFalse(marking4.strictlyLessThan(marking3));
+    assertFalse(marking3.strictlyLessThan(marking4));
+  }
+
+  @Test
+  void strictlyLessThanWorksNotWithDifferentSize() {
+    assertFalse(marking1.strictlyLessThan(marking3));
+  }
+
+  //===== isNotNegative() Tests =====//
+  @Test
+  void isNotNegativeWorks() {
+    Marking markingNull = new Marking(new int[3]);
+    marking = new Marking(new int[]{1, 0, 0});
+
+    assertTrue(markingNull.isNotNegative());
+    assertTrue(marking.isNotNegative());
+    assertTrue(marking1.isNotNegative());
+  }
+
+  //===== isSemiPositive() Tests =====//
+  @Test
+  void isSemiPositiveWorks() {
+    Marking markingNull = new Marking(new int[3]);
+    marking = new Marking(new int[]{1, 0, 0});
+
+    assertFalse(markingNull.isSemiPositive());
+    assertTrue(marking.isSemiPositive());
+    assertTrue(marking1.isSemiPositive());
+  }
+
+  //===== isStrictlyPositive() Tests =====//
+  @Test
+  void isStrictlyPositive() {
+    Marking markingNull = new Marking(new int[3]);
+    marking = new Marking(new int[]{1, 0, 0});
+
+    assertFalse(markingNull.isStrictlyPositive());
+    assertFalse(marking.isStrictlyPositive());
+    assertTrue(marking1.isStrictlyPositive());
+  }
+
+  //TODO: add, sub ...
 }
