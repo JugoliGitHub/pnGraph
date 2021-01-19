@@ -1,6 +1,6 @@
 package graphs;
 
-import graphs.objects.Vector;
+import graphs.objects.Marking;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
@@ -22,8 +22,8 @@ class ConditionEventSystem extends PetrinetWithCapacity {
    * @param mue0       start marking
    */
   public ConditionEventSystem(String name, List<Place> conditions, List<Transition> events,
-      List<Edge> flow, Vector mue0) {
-    super(name, conditions, events, flow, mue0, new Vector(mue0.getLength(), 1));
+      List<Edge> flow, Marking mue0) {
+    super(name, conditions, events, flow, mue0, new Marking(mue0.getLength(), 1));
     if (!isNotCorrect()) {
       throw new IllegalArgumentException(
           "This is no valid condition-event-system."

@@ -4,7 +4,7 @@ package graphs;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import graphs.objects.Vector;
+import graphs.objects.Marking;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
@@ -25,7 +25,7 @@ public class PetrinetTest {
   @Mock
   Transition transition1;
   @Mock
-  Vector mue0;
+  Marking mue0;
   List<Place> places;
   List<Transition> transitions;
   List<Edge> flow;
@@ -40,7 +40,7 @@ public class PetrinetTest {
     transition1 = Mockito.mock(Transition.class);
     places.add(place1);
     transitions.add(transition1);
-    mue0 = Mockito.mock(Vector.class);
+    mue0 = Mockito.mock(Marking.class);
     flow = new ArrayList<>();
     flow.add(new Edge(place1, transition1));
   }
@@ -94,7 +94,7 @@ public class PetrinetTest {
     transition1 = new Transition("t1");
     places = List.of(place1);
     transitions = List.of(transition1);
-    mue0 = new Vector(new int[]{1});
+    mue0 = new Marking(new int[]{1});
     flow = List.of(new Edge(place1, transition1));
 
     pn = new Petrinet("petrinet", places, transitions, flow, mue0);
@@ -120,7 +120,7 @@ public class PetrinetTest {
     transition1 = new Transition("t1");
     places = List.of(place1);
     transitions = List.of(transition1);
-    mue0 = new Vector(new int[]{1});
+    mue0 = new Marking(new int[]{1});
     flow = List.of(new Edge(place1, transition1));
 
     pn = new Petrinet("petrinet", places, transitions, flow, mue0).reversed();

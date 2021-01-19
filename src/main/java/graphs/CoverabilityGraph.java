@@ -1,7 +1,7 @@
 package graphs;
 
 import exception.WrongDimensionException;
-import graphs.objects.Vector;
+import graphs.objects.Marking;
 import graphs.objects.edges.CoverabilityGraphEdge;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Place;
@@ -18,11 +18,11 @@ public class CoverabilityGraph {
   protected Petrinet petrinet;
 
   protected String name;
-  protected Vector mue0;
-  protected List<Vector> markings;
+  protected Marking mue0;
+  protected List<Marking> markings;
   protected List<CoverabilityGraphEdge> knots;
 
-  protected List<Vector> visited;
+  protected List<Marking> visited;
 
   /**
    * Constructor of a coverability-graph.
@@ -31,7 +31,7 @@ public class CoverabilityGraph {
    * @param name     the name of this graph
    * @param petrinet corresponding petrinet
    */
-  public CoverabilityGraph(Vector mue0, String name, Petrinet petrinet) {
+  public CoverabilityGraph(Marking mue0, String name, Petrinet petrinet) {
     this.name = name;
     this.mue0 = mue0;
     this.markings = new ArrayList<>();
@@ -40,13 +40,13 @@ public class CoverabilityGraph {
 
     this.visited = new ArrayList<>();
     this.petrinet = petrinet;
-    ArrayList<Vector> path = new ArrayList<>();
+    ArrayList<Marking> path = new ArrayList<>();
     path.add(mue0);
     go(mue0, path);
     petrinet.getTransitions().forEach(this::setLiveness);
   }
 
-  protected CoverabilityGraph(Vector mue0, String name) {
+  protected CoverabilityGraph(Marking mue0, String name) {
     this.name = name;
     this.mue0 = mue0;
     this.markings = new ArrayList<>();
@@ -62,9 +62,11 @@ public class CoverabilityGraph {
    * @param mark marking that will be added if not present.
    * @return false when present
    */
-  public boolean addToMarkings(Vector mark) {
-    Optional<Vector> opt = markings.stream().filter(elem -> elem.equals(mark)).findFirst();
-    return !opt.isPresent() && markings.add(mark);
+  public boolean addToMarkings(Marking mark) {
+    if (markings.stream().noneMatch(mark::equals)) {
+      return markings.add(mark);
+    }
+    return false;
   }
 
   /**
@@ -74,9 +76,10 @@ public class CoverabilityGraph {
    * @return false when present
    */
   public boolean addToKnots(CoverabilityGraphEdge edge) {
-    Optional<CoverabilityGraphEdge> opt = knots.stream().filter(elem -> elem.equals(edge))
-        .findFirst();
-    return !opt.isPresent() && knots.add(edge);
+    if (knots.stream().noneMatch(edge::equals)) {
+      return knots.add(edge);
+    }
+    return false;
   }
 
   /**
@@ -85,9 +88,11 @@ public class CoverabilityGraph {
    * @param newVector the new mue
    * @return false when visited
    */
-  private boolean addToVisited(Vector newVector) {
-    Optional<Vector> opt = visited.stream().filter(elem -> elem.equals(newVector)).findFirst();
-    return !opt.isPresent() && visited.add(newVector);
+  private boolean addToVisited(Marking newVector) {
+    if (visited.stream().noneMatch(newVector::equals)) {
+      return visited.add(newVector);
+    }
+    return false;
   }
 
   /**
@@ -100,9 +105,9 @@ public class CoverabilityGraph {
    * @return An Optional which is empty, when the transition could not be fired
    * @throws WrongDimensionException when the vector has a different dimension
    */
-  protected Optional<Vector> fire(Vector mue, Transition transition)
+  protected Optional<Marking> fire(Marking mue, Transition transition)
       throws WrongDimensionException {
-    Vector newMue = new Vector(mue.getLength());
+    Marking newMue = new Marking(mue.getLength());
     newMue = newMue.add(mue);
     if (transition.getPostSet().getLength() == 0 || transition.getPreSet().getLength() == 0) {
       if (petrinet.getTransitions().contains(transition)) {
@@ -138,7 +143,7 @@ public class CoverabilityGraph {
           }
         }
       }
-    } else if (!newMue.sub(transition.getPreSet()).equals(new Vector(0))) {
+    } else if (!newMue.sub(transition.getPreSet()).equals(new Marking(0))) {
       newMue = newMue.sub(transition.getPreSet()).add(transition.getPostSet());
       setBoundednessOfPlaces(mue, newMue);
     } else {
@@ -157,12 +162,12 @@ public class CoverabilityGraph {
    * @param path path
    * @throws WrongDimensionException when the vector has a different dimension
    */
-  protected void go(Vector mue, List<Vector> path) throws WrongDimensionException {
+  protected void go(Marking mue, List<Marking> path) throws WrongDimensionException {
     for (Transition transition : petrinet.getTransitions()) {
-      Optional<Vector> newMueOptional = fire(mue, transition);
+      Optional<Marking> newMueOptional = fire(mue, transition);
       if (newMueOptional.isPresent()) {
-        Vector newMue = newMueOptional.get();
-        newMue = setOmega(newMue, path);
+        Marking newMue = newMueOptional.get();
+        setOmega(newMue, path);
         if (newMue.containsOmega()) {
           transition.setLiveness(1);
         }
@@ -177,18 +182,24 @@ public class CoverabilityGraph {
     }
   }
 
+  private static void setOmega(Marking mue, List<Marking> path) {
+    path.stream()
+        .filter(waypoint -> waypoint.lessThan(mue))
+        .forEach(mue::setOmegas);
+  }
+
   /**
    * Implementation of 'setzeOmega' from Algorithm 1: uebGraph.
    *
    * @param mue  state of given markings
    * @param path path
    */
-  private Vector setOmega(Vector mue, List<Vector> path) {
+  private Marking putOmega(Marking mue, List<Marking> path) {
     List<Place> places = petrinet.getPlaces();
     boolean[] omegas = new boolean[petrinet.getPlaces().size()];
     boolean[] omegaKand = new boolean[petrinet.getPlaces().size()];
     for (int i = path.size() - 1; i >= 0; i--) {
-      Vector knot = path.get(i);
+      Marking knot = path.get(i);
       if (knot.lessThan(mue)) {
         for (int s = 0; s < places.size(); s++) {
           if (knot.get(s) < mue.get(s) && mue.get(s) != -1) {
@@ -232,21 +243,21 @@ public class CoverabilityGraph {
         .isPresent();
   }
 
-  private boolean findLoopRecursive(Vector from, List<Vector> visitedVectors,
+  private boolean findLoopRecursive(Marking from, List<Marking> visitedMarkings,
       CoverabilityGraphEdge edge) {
-    Vector edgeTo = edge.getTo();
+    Marking edgeTo = edge.getTo();
     if (edgeTo.equals(from)) {
       return true;
-    } else if (visitedVectors.contains(edgeTo)) {
+    } else if (visitedMarkings.contains(edgeTo)) {
       return false;
     } else {
-      visitedVectors.add(edgeTo);
+      visitedMarkings.add(edgeTo);
       return knots.stream().filter(edge2 -> edge2.getFrom().equals(edgeTo))
-          .map(knot -> findLoopRecursive(from, visitedVectors, knot)).findFirst().isPresent();
+          .map(knot -> findLoopRecursive(from, visitedMarkings, knot)).findFirst().isPresent();
     }
   }
 
-  protected void setBoundednessOfPlaces(Vector mue, Vector newMue) {
+  protected void setBoundednessOfPlaces(Marking mue, Marking newMue) {
     if (!newMue.equals(mue)) {
       for (int i = 0; i < newMue.getLength(); i++) {
         if (petrinet.getPlaces().get(i).getBoundedness() == -1 || newMue.get(i) == -1) {

@@ -1,6 +1,6 @@
 package graphs.objects.edges;
 
-import graphs.objects.Vector;
+import graphs.objects.Marking;
 import graphs.objects.nodes.Transition;
 
 /**
@@ -8,8 +8,8 @@ import graphs.objects.nodes.Transition;
  */
 public class CoverabilityGraphEdge {
 
-  private final Vector from;
-  private final Vector to;
+  private final Marking from;
+  private final Marking to;
   private final Transition transition;
 
   /**
@@ -19,7 +19,7 @@ public class CoverabilityGraphEdge {
    * @param transition the used transition
    * @param to         the to marking
    */
-  public CoverabilityGraphEdge(Vector from, Transition transition, Vector to) {
+  public CoverabilityGraphEdge(Marking from, Transition transition, Marking to) {
     this.from = from;
     this.to = to;
     this.transition = transition;
@@ -29,11 +29,11 @@ public class CoverabilityGraphEdge {
     return transition;
   }
 
-  public Vector getFrom() {
+  public Marking getFrom() {
     return from;
   }
 
-  public Vector getTo() {
+  public Marking getTo() {
     return to;
   }
 
