@@ -2,6 +2,7 @@ package graphs.objects;
 
 import exception.WrongDimensionException;
 import java.util.Arrays;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -95,14 +96,20 @@ public class Marking {
     return vectorArray[i];
   }
 
-  public int[] getVectorArray() {
-    return vectorArray;
-  }
-
+  /**
+   * Checks whether a omega-value is in this marking.
+   *
+   * @return true when omega in marking
+   */
   public boolean containsOmega() {
     return Arrays.stream(vectorArray).anyMatch(i -> i == -1);
   }
 
+  /**
+   * Sets omega-values, when an index of the waypoint is smaller than this index at this marking.
+   *
+   * @param waypoint another marking to compare to
+   */
   public void setOmegas(Marking waypoint) {
     if (this.getLength() == waypoint.getLength()) {
       for (int i = 0; i < this.getLength(); i++) {
@@ -116,10 +123,11 @@ public class Marking {
   }
 
   /**
-   * Compares this vector to the given parameter.
+   * Compares two markings of less-/equality. Two markings are smaller than/ equal, when their length is equal
+   * and for every pair of numbers a, b applies: a <= b.
    *
    * @param marking to compare to
-   * @return true when this vector is less than the other
+   * @return true when this vector is less/equal than the other
    */
   public boolean lessEquals(Marking marking) {
     if (length == marking.getLength()) {
@@ -141,7 +149,8 @@ public class Marking {
   }
 
   /**
-   * Compares this vector to the given parameter.
+   * Compares two markings. Two markings are equal, when their length is equal
+   *    * and for every pair of numbers a, b applies: a <= b.
    *
    * @param marking to compare to
    * @return true when this vector is less than the other
@@ -176,19 +185,8 @@ public class Marking {
     return false;
   }
 
-  private boolean isLessThan(Marking marking) {
-    for (int i = 0; i < length; i++) {
-      int thisInt = this.vectorArray[i];
-      int thatInt = marking.get(i);
-      if (!(thisInt <= thatInt) && thatInt != -1 && thisInt != -1) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   /**
-   * Checks if this vector is not negative.
+   * Checks if this marking is not negative.
    *
    * @return true, when this is not negative
    */
@@ -197,7 +195,7 @@ public class Marking {
   }
 
   /**
-   * Checks if this vector is semi-positive.
+   * Checks if this mark is semi-positive.
    *
    * @return true, when this is semi-positive
    */
@@ -206,7 +204,7 @@ public class Marking {
   }
 
   /**
-   * Checks if this vector is strictly positive.
+   * Checks if this mark is strictly positive.
    *
    * @return true, when this is strictly positive
    */
@@ -221,22 +219,22 @@ public class Marking {
    */
   public Marking add(Marking marking) throws WrongDimensionException {
     if (marking.length == length) {
-      Marking temp = new Marking(vectorArray.clone());
+      Marking result = new Marking(vectorArray.clone());
       for (int i = 0; i < length; i++) {
-        if (temp.vectorArray[i] == -1) {
+        if (result.vectorArray[i] == -1) {
           continue;
         }
         if (marking.get(i) >= 0) {
-          if (temp.vectorArray[i] >= 0) {
-            temp.vectorArray[i] += marking.get(i);
+          if (result.vectorArray[i] >= 0) {
+            result.vectorArray[i] += marking.get(i);
           }
         } else if (marking.get(i) == -1) {
-          temp.vectorArray[i] = -1;
+          result.vectorArray[i] = -1;
         } else {
           throw new IllegalArgumentException("Can´t add with negative values.");
         }
       }
-      return temp;
+      return result;
     } else {
       throw new WrongDimensionException("The Vectors must have the same dimension to add them.");
     }
@@ -252,14 +250,14 @@ public class Marking {
     if (this.length != marking.length) {
       return new Marking(0);
     }
-    Marking temp = new Marking(vectorArray.clone());
+    Marking result = new Marking(vectorArray.clone());
     for (int i = 0; i < length; i++) {
-      temp = temp.subAtIndex(i, marking.get(i));
-      if (temp.length == 0) {
+      result = result.subAtIndex(i, marking.get(i));
+      if (result.length == 0) {
         return new Marking(0);
       }
     }
-    return temp;
+    return result;
   }
 
   /**
@@ -321,6 +319,11 @@ public class Marking {
     return new Marking(0);
   }
 
+  /**
+   * Returns a copy of this vector.
+   *
+   * @return a new marking with the same values
+   */
   public Marking copy() {
     return new Marking(vectorArray.clone());
   }
