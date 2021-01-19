@@ -28,7 +28,7 @@ public class LabelledTransitionSystemWithCapacity extends CoverabilityGraph {
     capacity = petrinet.getCapacity();
     ArrayList<Marking> path = new ArrayList<>();
     path.add(mue0);
-    go(mue0, path);
+    run(mue0, path);
     this.petrinet.getTransitions().forEach(this::setLiveness);
   }
 

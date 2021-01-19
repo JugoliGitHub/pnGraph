@@ -3,12 +3,11 @@ package graphs;
 import exception.WrongDimensionException;
 import graphs.objects.Marking;
 import graphs.objects.edges.CoverabilityGraphEdge;
-import graphs.objects.edges.Edge;
-import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 /**
  * A class to create coverability-graphs for a petrinet.
@@ -42,7 +41,7 @@ public class CoverabilityGraph {
     this.petrinet = petrinet;
     ArrayList<Marking> path = new ArrayList<>();
     path.add(mue0);
-    go(mue0, path);
+    run(mue0, path);
     petrinet.getTransitions().forEach(this::setLiveness);
   }
 
@@ -54,6 +53,18 @@ public class CoverabilityGraph {
     markings.add(this.mue0);
 
     this.visited = new ArrayList<>();
+  }
+
+  /**
+   * Changes a markings elements to omega, when markings on the path are less than the mue.
+   *
+   * @param mue  the current marking
+   * @param path the last markings to reach mue
+   */
+  private static void setOmega(Marking mue, List<Marking> path) {
+    path.stream()
+        .filter(waypoint -> waypoint.lessThan(mue))
+        .forEach(mue::setOmegas);
   }
 
   /**
@@ -95,10 +106,20 @@ public class CoverabilityGraph {
     return false;
   }
 
+  protected void setBoundednessOfPlaces(Marking mue, Marking newMue) {
+    if (!newMue.equals(mue)) {
+      IntStream.range(0, mue.getLength()).forEach(i -> {
+        if (petrinet.getPlaces().get(i).getBoundedness() == -1 || newMue.get(i) == -1) {
+          petrinet.getPlaces().get(i).setBoundedness(-1);
+        } else if (petrinet.getPlaces().get(i).getBoundedness() < newMue.get(i)) {
+          petrinet.getPlaces().get(i).setBoundedness(newMue.get(i));
+        }
+      });
+    }
+  }
+
   /**
-   * Fires a transition with a given mue, when possible. This method will create own front and end
-   * places if necessary. When the transition has them it will calculate the following state with
-   * them.
+   * Fires a transition with a given mue, when possible.
    *
    * @param mue        current state of markings
    * @param transition transition to be fired
@@ -107,120 +128,44 @@ public class CoverabilityGraph {
    */
   protected Optional<Marking> fire(Marking mue, Transition transition)
       throws WrongDimensionException {
-    Marking newMue = new Marking(mue.getLength());
-    newMue = newMue.add(mue);
-    if (transition.getPostSet().getLength() == 0 || transition.getPreSet().getLength() == 0) {
-      if (petrinet.getTransitions().contains(transition)) {
-        List<Place> frontPlaces = new ArrayList<>();
-        List<Place> endPlaces = new ArrayList<>();
-
-        for (Edge edge : petrinet.getFlow()) {
-          if (edge.getFrom().equals(transition) && edge.getTo() instanceof Place) {
-            endPlaces.add((Place) edge.getTo());
-          } else if (edge.getTo().equals(transition) && edge.getFrom() instanceof Place) {
-            frontPlaces.add((Place) edge.getFrom());
-          }
-        }
-
-        for (Place place : frontPlaces) {
-          int index = petrinet.getPlaces().indexOf(place);
-          int newValueOfPlace = newMue.get(index);
-          if (newValueOfPlace == 0) {
-            return Optional.empty();
-          } else if (newValueOfPlace >= 1) {
-            newMue = newMue.subAtIndex(index, 1);
-            if (newMue.getLength() == 0) {
-              return Optional.empty();
-            }
-          }
-        }
-        for (Place place : endPlaces) {
-          int index = petrinet.getPlaces().indexOf(place);
-          int newValueOfPlace = newMue.get(index);
-          newMue = newMue.addAtIndex(index, 1);
-          if (place.getBoundedness() < newValueOfPlace) {
-            place.setBoundedness(newValueOfPlace);
-          }
-        }
-      }
-    } else if (!newMue.sub(transition.getPreSet()).equals(new Marking(0))) {
-      newMue = newMue.sub(transition.getPreSet()).add(transition.getPostSet());
+    if (!mue.sub(transition.getPreSet()).equals(new Marking(0))) {
+      Marking newMue = mue.sub(transition.getPreSet()).add(transition.getPostSet());
       setBoundednessOfPlaces(mue, newMue);
+      if (transition.isDead()) {
+        transition.setLiveness(0);
+      }
+      return Optional.of(newMue);
     } else {
       return Optional.empty();
     }
-    if (transition.isDead()) {
-      transition.setLiveness(0);
-    }
-    return Optional.of(newMue);
   }
 
   /**
-   * Implementation of 'laufe' from Algorithm 1: uebGraph.
+   * Implementation of 'laufe' from Algorithm 1: uebGraph. Checks every transition for a given
+   * marking. If the transition can fire, it checks for omegas, adds a new edge to the graph and
+   * calls itself with the new marking and the path.
    *
    * @param mue  given state of markings
-   * @param path path
+   * @param path last markings to reach mue
    * @throws WrongDimensionException when the vector has a different dimension
    */
-  protected void go(Marking mue, List<Marking> path) throws WrongDimensionException {
+  protected void run(Marking mue, List<Marking> path) throws WrongDimensionException {
     for (Transition transition : petrinet.getTransitions()) {
-      Optional<Marking> newMueOptional = fire(mue, transition);
-      if (newMueOptional.isPresent()) {
-        Marking newMue = newMueOptional.get();
+      fire(mue, transition).ifPresent(newMue -> {
         setOmega(newMue, path);
         if (newMue.containsOmega()) {
           transition.setLiveness(1);
+          //TODO: liveness of place
         }
         addToMarkings(newMue);
         addToKnots(new CoverabilityGraphEdge(mue, transition, newMue));
         if (addToVisited(newMue)) {
           path.add(newMue);
-          go(newMue, path);
+          run(newMue, path);
           path.remove(path.size() - 1);
         }
-      }
+      });
     }
-  }
-
-  private static void setOmega(Marking mue, List<Marking> path) {
-    path.stream()
-        .filter(waypoint -> waypoint.lessThan(mue))
-        .forEach(mue::setOmegas);
-  }
-
-  /**
-   * Implementation of 'setzeOmega' from Algorithm 1: uebGraph.
-   *
-   * @param mue  state of given markings
-   * @param path path
-   */
-  private Marking putOmega(Marking mue, List<Marking> path) {
-    List<Place> places = petrinet.getPlaces();
-    boolean[] omegas = new boolean[petrinet.getPlaces().size()];
-    boolean[] omegaKand = new boolean[petrinet.getPlaces().size()];
-    for (int i = path.size() - 1; i >= 0; i--) {
-      Marking knot = path.get(i);
-      if (knot.lessThan(mue)) {
-        for (int s = 0; s < places.size(); s++) {
-          if (knot.get(s) < mue.get(s) && mue.get(s) != -1) {
-            omegaKand[s] = true;
-          }
-        }
-      }
-      for (int s = 0; s < places.size(); s++) {
-        if (omegaKand[s]) {
-          omegas[s] = true;
-        }
-      }
-      omegaKand = new boolean[petrinet.getPlaces().size()];
-    }
-    for (int s = 0; s < places.size(); s++) {
-      if (omegas[s]) {
-        mue = mue.setOmega(s);
-        places.get(s).setBoundedness(-1);
-      }
-    }
-    return mue;
   }
 
   protected void setLiveness(Transition transition) {
@@ -254,18 +199,6 @@ public class CoverabilityGraph {
       visitedMarkings.add(edgeTo);
       return knots.stream().filter(edge2 -> edge2.getFrom().equals(edgeTo))
           .map(knot -> findLoopRecursive(from, visitedMarkings, knot)).findFirst().isPresent();
-    }
-  }
-
-  protected void setBoundednessOfPlaces(Marking mue, Marking newMue) {
-    if (!newMue.equals(mue)) {
-      for (int i = 0; i < newMue.getLength(); i++) {
-        if (petrinet.getPlaces().get(i).getBoundedness() == -1 || newMue.get(i) == -1) {
-          petrinet.getPlaces().get(i).setBoundedness(-1);
-        } else if (petrinet.getPlaces().get(i).getBoundedness() < newMue.get(i)) {
-          petrinet.getPlaces().get(i).setBoundedness(newMue.get(i));
-        }
-      }
     }
   }
 
