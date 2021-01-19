@@ -1,6 +1,6 @@
 package graphs;
 
-import graphs.objects.Vector;
+import graphs.objects.Marking;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
@@ -8,7 +8,7 @@ import java.util.List;
 
 public class PetrinetWithCapacity extends Petrinet {
 
-  private final Vector capacity;
+  private final Marking capacity;
 
   /**
    * Creates an empty petrinet. Should initialize mue_0, capacity (if present) and places,
@@ -17,7 +17,7 @@ public class PetrinetWithCapacity extends Petrinet {
    * @param name name of the net
    */
   public PetrinetWithCapacity(String name, List<Place> places, List<Transition> transitions,
-      List<Edge> flow, Vector mue0, Vector capacity) {
+      List<Edge> flow, Marking mue0, Marking capacity) {
     super(name, places, transitions, flow, mue0);
     this.capacity = capacity;
     if (!isNotCorrect()) {
@@ -25,7 +25,7 @@ public class PetrinetWithCapacity extends Petrinet {
     }
   }
 
-  public Vector getCapacity() {
+  public Marking getCapacity() {
     return capacity;
   }
 

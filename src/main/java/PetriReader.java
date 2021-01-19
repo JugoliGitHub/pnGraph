@@ -3,7 +3,7 @@ import exception.WrongDimensionException;
 import graphs.CoverabilityGraph;
 import graphs.Petrinet;
 import graphs.PetrinetWithCapacity;
-import graphs.objects.Vector;
+import graphs.objects.Marking;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
@@ -98,7 +98,7 @@ public class PetriReader {
    * @return the constructed petri-net
    */
   public static Petrinet createPetriNetAndMarkings(String pnString, String markingsString) {
-    Vector mue0 = new Vector(markingsString.split(","));
+    Marking mue0 = new Marking(markingsString.split(","));
     List<Place> places = new ArrayList<>();
     List<Transition> transitions = new ArrayList<>();
     List<Edge> flow = new ArrayList<>();
@@ -182,9 +182,9 @@ public class PetriReader {
    * @return the constructed petri-net
    */
   public static PetrinetWithCapacity createPetriNetWithCapacityAndMarkings(String pnString,
-      String markingsString, Vector capacity) {
+      String markingsString, Marking capacity) {
     //TODO: Auslagern, überlappung mit normalem petrinetz
-    Vector mue0 = new Vector(markingsString.split(","));
+    Marking mue0 = new Marking(markingsString.split(","));
     List<Place> places = new ArrayList<>();
     List<Transition> transitions = new ArrayList<>();
     List<Edge> flow = new ArrayList<>();

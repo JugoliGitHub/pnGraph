@@ -1,7 +1,7 @@
 package graphs;
 
 import exception.WrongDimensionException;
-import graphs.objects.Vector;
+import graphs.objects.Marking;
 import graphs.objects.nodes.Transition;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -12,7 +12,7 @@ import java.util.Optional;
  */
 public class LabelledTransitionSystemWithCapacity extends CoverabilityGraph {
 
-  private final Vector capacity;
+  private final Marking capacity;
 
   /**
    * Constructor of a labelled-transition-system.
@@ -21,21 +21,21 @@ public class LabelledTransitionSystemWithCapacity extends CoverabilityGraph {
    * @param name     name of the graph
    * @param petrinet corresponding petrinet
    */
-  public LabelledTransitionSystemWithCapacity(Vector mue0, String name, PetrinetWithCapacity petrinet)
+  public LabelledTransitionSystemWithCapacity(Marking mue0, String name, PetrinetWithCapacity petrinet)
       throws WrongDimensionException {
     super(mue0, name);
     this.petrinet = petrinet;
     capacity = petrinet.getCapacity();
-    ArrayList<Vector> path = new ArrayList<>();
+    ArrayList<Marking> path = new ArrayList<>();
     path.add(mue0);
     go(mue0, path);
     this.petrinet.getTransitions().forEach(this::setLiveness);
   }
 
   @Override
-  protected Optional<Vector> fire(Vector mue, Transition transition)
+  protected Optional<Marking> fire(Marking mue, Transition transition)
       throws WrongDimensionException {
-    Vector newMue = new Vector(mue.getLength());
+    Marking newMue = new Marking(mue.getLength());
     newMue = newMue.add(mue);
     if (transition.getPostSet().getLength() == 0 || transition.getPreSet().getLength() == 0) {
       throw new IllegalArgumentException("Initialize in- and output first.");

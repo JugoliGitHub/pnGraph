@@ -1,6 +1,6 @@
 package graphs.objects.nodes;
 
-import graphs.objects.Vector;
+import graphs.objects.Marking;
 import graphs.objects.edges.Edge;
 import java.util.List;
 
@@ -10,19 +10,19 @@ import java.util.List;
 public abstract class Node {
 
   protected final String label;
-  protected Vector preSet;
-  protected Vector postSet;
+  protected Marking preSet;
+  protected Marking postSet;
 
   protected Node(String label) {
     this.label = label;
-    this.preSet = new Vector(0);
-    this.postSet = new Vector(0);
+    this.preSet = new Marking(0);
+    this.postSet = new Marking(0);
   }
 
   protected Node(String label, int size) {
     this.label = label;
-    this.preSet = new Vector(size);
-    this.postSet = new Vector(size);
+    this.preSet = new Marking(size);
+    this.postSet = new Marking(size);
   }
 
   /**
@@ -34,19 +34,19 @@ public abstract class Node {
    */
   public abstract void setVectors(List<Edge> flow, List<? extends Node> otherNodes, int dimension);
 
-  public Vector getPreSet() {
+  public Marking getPreSet() {
     return preSet;
   }
 
-  protected void setPreSet(Vector preSet) {
+  protected void setPreSet(Marking preSet) {
     this.preSet = preSet;
   }
 
-  public Vector getPostSet() {
+  public Marking getPostSet() {
     return postSet;
   }
 
-  protected void setPostSet(Vector postSet) {
+  protected void setPostSet(Marking postSet) {
     this.postSet = postSet;
   }
 

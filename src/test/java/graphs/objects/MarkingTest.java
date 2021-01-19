@@ -9,14 +9,14 @@ import org.junit.jupiter.api.Test;
 /**
  * Class to test the Vector
  */
-public class VectorTest {
+public class MarkingTest {
 
-  Vector vector;
+  Marking marking;
 
   @Test
   void createVectorWithNoLengthFails() {
     try {
-      vector = new Vector(0);
+      marking = new Marking(0);
     } catch (IllegalArgumentException e) {
       assertEquals(e.getMessage(), "The size must be at least 1.");
     }
@@ -25,7 +25,7 @@ public class VectorTest {
   @Test
   void createVectorWithNegativeLengthFails() {
     try {
-      vector = new Vector(-1);
+      marking = new Marking(-1);
     } catch (IllegalArgumentException e) {
       assertEquals(e.getMessage(), "The size must be at least 1.");
     }
@@ -34,7 +34,7 @@ public class VectorTest {
   @Test
   void createVectorWithNegativeValueFails() {
     try {
-      vector = new Vector(1, -2);
+      marking = new Marking(1, -2);
     } catch (IllegalArgumentException e) {
       assertEquals(e.getMessage(), "The value must be positive or -1 as omega.");
     }
@@ -42,25 +42,25 @@ public class VectorTest {
 
   @Test
   void createVectorWithOneValueWorks() {
-    vector = new Vector(2, 0);
+    marking = new Marking(2, 0);
 
-    assertEquals(vector.getLength(), 2);
-    assertEquals(vector.get(0), 0);
-    assertEquals(vector.get(1), 0);
+    assertEquals(marking.getLength(), 2);
+    assertEquals(marking.get(0), 0);
+    assertEquals(marking.get(1), 0);
   }
 
   @Test
   void createNullVectorWorks() {
-    vector = new Vector(1);
+    marking = new Marking(1);
 
-    assertEquals(vector.getLength(), 1);
-    assertEquals(vector.get(0), 0);
+    assertEquals(marking.getLength(), 1);
+    assertEquals(marking.get(0), 0);
   }
 
   @Test
   void createVectorWithArrayNegativeValuesFails() {
     try {
-      vector = new Vector(new int[]{0, 1, -1, -2});
+      marking = new Marking(new int[]{0, 1, -1, -2});
     } catch (IllegalArgumentException e) {
       assertEquals(e.getMessage(), "All values must be positive or -1 as omega.");
     }
@@ -68,24 +68,24 @@ public class VectorTest {
 
   @Test
   void createVectorWithArrayWorks() {
-    vector = new Vector(new int[]{0, 1, -1, 2});
+    marking = new Marking(new int[]{0, 1, -1, 2});
 
-    assertEquals(vector.getLength(), 4);
-    assertEquals(vector.get(0), 0);
-    assertEquals(vector.get(1), 1);
-    assertEquals(vector.get(2), -1);
-    assertEquals(vector.get(3), 2);
+    assertEquals(marking.getLength(), 4);
+    assertEquals(marking.get(0), 0);
+    assertEquals(marking.get(1), 1);
+    assertEquals(marking.get(2), -1);
+    assertEquals(marking.get(3), 2);
   }
 
   //other constructors
 
   @Test
   void containsOmegaWorks() {
-    Vector vectorWithoutOmega = new Vector(new int[]{1, 2, 3});
-    Vector vector = new Vector(new int[]{1, 2, -1});
+    Marking markingWithoutOmega = new Marking(new int[]{1, 2, 3});
+    Marking marking = new Marking(new int[]{1, 2, -1});
 
-    assertFalse(vectorWithoutOmega.containsOmega());
-    assertTrue(vector.containsOmega());
+    assertFalse(markingWithoutOmega.containsOmega());
+    assertTrue(marking.containsOmega());
   }
 
   @Test

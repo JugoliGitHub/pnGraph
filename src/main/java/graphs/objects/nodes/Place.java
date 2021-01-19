@@ -1,6 +1,6 @@
 package graphs.objects.nodes;
 
-import graphs.objects.Vector;
+import graphs.objects.Marking;
 import graphs.objects.edges.Edge;
 import java.util.List;
 
@@ -37,8 +37,8 @@ public class Place extends Node {
         arrOut[to.indexIn(transitions)] += 1;
       }
     });
-    this.setPreSet(new Vector(arrIn));
-    this.setPostSet(new Vector(arrOut));
+    this.setPreSet(new Marking(arrIn));
+    this.setPostSet(new Marking(arrOut));
   }
 
   /**

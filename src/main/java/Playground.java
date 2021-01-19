@@ -1,4 +1,6 @@
 import graphs.Petrinet;
+import graphs.objects.Marking;
+import java.util.List;
 
 /**
  * This class is for quick testing inside my IDE.
@@ -37,9 +39,23 @@ public class Playground {
     Petrinet p = PetriReader
         //.createPetriNetAndMarkings("s1:a,b;s2:c;s3:d;;a:s2;b:s3;c:s2,s3;d:s2;;", "1,0,0");
         //.createPetriNetAndMarkings("s1:a;s2:b;;a:s2;b:s1;;", "1,0");
-        .createPetriNetAndMarkings("s1:a;s2:b;s3:c;;a:s2;b:s3;c:s1;;", "1,0,0");
-    System.out.println(p.isStronglyConnected());
+        //.createPetriNetAndMarkings("s1:a;s2:b;s3:c;;a:s2;b:s3;c:s1;;", "1,0,0");
+        .createPetriNetAndMarkings(
+            "s1:t1;s2:t1,t1,t2;s3:t3;s4:t4,t4,t5;;t1:s2,s2;t2:s3;t3:s4;t4:s1,s4,s4;t5:s1,s2,s2;;",
+            "0,0,0,1");
+        //.createPetriNetAndMarkings(
+        //"s1:a,b;s2:c;s3:d;;a:s2;b:s3;c:s2,s3;d:s2;;",
+        //"1,0,0");
+    // System.out.println(p.isStronglyConnected());
+    System.out.println(p.toString());
 
+    System.out.println(p.createCoverabilityGraph().toString());
+
+    List<Marking> path = List.of(new Marking(new int[]{0,1,-1}), new Marking(new int[]{1, -1,-1}));
+    Marking mue = new Marking(new int[]{0,2,-1});
+    System.out.println(path.stream()
+        .filter(waypoint -> waypoint.lessThan(mue))
+        .reduce(mue, Marking::setOmegas));
   }
 
 }
