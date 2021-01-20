@@ -4,7 +4,11 @@ This is a repository about petrinets. Due to a lecture at university I created t
 To create own petrinets we used pn-strings. These are used as inputs to create the petrinets.
 The ```toString()```-methods create an output to display graphs with [graphViz](http://www.graphviz.org/). 
 ### pn-strings
-Strings of the form: ```-p"s1:t1;;t1:s1;;" -m"1"```
+Strings of the form: ```-p"s1:t1;;t1:s1;;" -m"1"```. Petrinets must be correct to be created. 
+A correct petrinet
+* has transitions
+* is connected
+* contains the same number of places as dimension of the marking.
 #### p-part
 In the section after -p the petrinet is defined.
 
@@ -24,19 +28,33 @@ The output of coverability-graphs is shown as nodes with the markings string and
 used transition labelled.
 
 # Features
-## Create a Petrinet
+## Create a Petrinet and Analyse a Petrinet
 ### petrinet
+Petrinets are place/transition-systems. They are either created with the 
+[PetriReader](/src/main/java/PetriReader.java) and a corresponding pn-string or with given constructor.
+You need each a list of places, transitions and edges. When the net is correct you can analyse 
+the following attributes:
+* strongly connected (wip)
+* contains loops
+* boundedness
+* todo add other: free choice s.o.
+
+Additionally you can create the following graphs:
+* dual petrinet
+* reverse petrinet
+* [coverabillity graph](src/main/java/graphs/CoverabilityGraph.java)
+ 
 ### with capacity
 ### condition/event system
 
-## Analyse a Petrinet
+
 ### reachability graph
 ### coverability graph
 ### labelled transition system
 
 # Use
 ## inside IDE 
-Easiest way with the class [Playground](src/main/java/Playground.java).
+The easiest way with the class [Playground](src/main/java/Playground.java).
 
 ## From the commandline
 
