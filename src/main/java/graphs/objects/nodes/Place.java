@@ -67,6 +67,17 @@ public class Place extends Node {
     }
   }
 
+  /**
+   * Sets the boundedness to a value k.
+   *
+   * @param k an integer bigger equal 0 or -1 if the place is unbounded
+   */
+  public void setBoundednessIfHigher(int k) {
+    if (this.boundedness < k || k == -1) {
+      setBoundedness(k);
+    }
+  }
+
   public int getCapacity() {
     return this.capacity;
   }

@@ -56,18 +56,6 @@ public class CoverabilityGraph {
   }
 
   /**
-   * Changes a markings elements to omega, when markings on the path are less than the mue.
-   *
-   * @param mue  the current marking
-   * @param path the last markings to reach mue
-   */
-  private static void setOmega(Marking mue, List<Marking> path) {
-    path.stream()
-        .filter(waypoint -> waypoint.lessThan(mue))
-        .forEach(mue::setOmegas);
-  }
-
-  /**
    * Adds a vector to the list markings, when it is not already present.
    *
    * @param mark marking that will be added if not present.
@@ -141,6 +129,18 @@ public class CoverabilityGraph {
   }
 
   /**
+   * Changes a markings elements to omega, when markings on the path are less than the mue.
+   *
+   * @param mue  the current marking
+   * @param path the last markings to reach mue
+   */
+  private static void setOmega(Marking mue, List<Marking> path) {
+    path.stream()
+        .filter(waypoint -> waypoint.lessThan(mue))
+        .forEach(mue::setOmegas);
+  }
+
+  /**
    * Implementation of 'laufe' from Algorithm 1: uebGraph. Checks every transition for a given
    * marking. If the transition can fire, it checks for omegas, adds a new edge to the graph and
    * calls itself with the new marking and the path.
@@ -155,8 +155,9 @@ public class CoverabilityGraph {
         setOmega(newMue, path);
         if (newMue.containsOmega()) {
           transition.setLiveness(1);
-          //TODO: liveness of place
         }
+        IntStream.range(0, newMue.getLength())
+            .forEach(i -> petrinet.getPlaces().get(i).setBoundednessIfHigher(newMue.get(i)));
         addToMarkings(newMue);
         addToKnots(new CoverabilityGraphEdge(mue, transition, newMue));
         if (addToVisited(newMue)) {
