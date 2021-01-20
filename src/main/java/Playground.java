@@ -35,19 +35,20 @@ public class Playground {
     System.out.println(flow.toString());
     System.out.println(fl.toString()); */
     Petrinet p = PetriReader
-        //.createPetriNetAndMarkings("s1:a,b;s2:c;s3:d;;a:s2;b:s3;c:s2,s3;d:s2;;", "1,0,0");
+        //.createPetriNetAndMarkings("s1:a,b;s2:c;s3:d;s4:;;a:s2;b:s3;c:s2,s3;d:s2,s4;;", "1,0,0,0");
         //.createPetriNetAndMarkings("s1:a;s2:b;;a:s2;b:s1;;", "1,0");
         //.createPetriNetAndMarkings("s1:a;s2:b;s3:c;;a:s2;b:s3;c:s1;;", "1,0,0");
-        .createPetriNetAndMarkings(
-            "s1:t1;s2:t1,t1,t2;s3:t3;s4:t4,t4,t5;;t1:s2,s2;t2:s3;t3:s4;t4:s1,s4,s4;t5:s1,s2,s2;;",
-            "0,0,0,1");
-        //.createPetriNetAndMarkings(
-        //"s1:a,b;s2:c;s3:d;;a:s2;b:s3;c:s2,s3;d:s2;;",
-        //"1,0,0");
+        .createPetriNetAndMarkings("s1:a;;a:s1;;", "1");
+    // .createPetriNetAndMarkings(
+    // "s1:t1;s2:t1,t1,t2;s3:t3;s4:t4,t4,t5;;t1:s2,s2;t2:s3;t3:s4;t4:s1,s4,s4;t5:s1,s2,s2;;",
+    // "0,0,0,1");
+    //.createPetriNetAndMarkings(
+    //"s1:a,b;s2:c;s3:d;;a:s2;b:s3;c:s2,s3;d:s2;;",
+    //"1,0,0");
     // System.out.println(p.isStronglyConnected());
-    System.out.println(p.toString());
-
-    System.out.println(p.createCoverabilityGraph().toString());
+    //System.out.println(p.toString());
+    System.out.println(p.isStronglyConnected());
+    System.out.println(p.containsLoop());
   }
 
 }

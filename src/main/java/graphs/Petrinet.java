@@ -42,37 +42,37 @@ public class Petrinet {
     }
     setVectors();
     setInitialBoundedness();
-    // setPaths();
+    setPaths();
   }
 
   public Marking getMue0() {
     return this.mue0;
   }
 
-  //TODO  return new Petrinet with an extra place
-  //TODO: change vector mue 0
-  public void addPlace(Place place) {
-    places.add(place);
-  }
-
   public List<Place> getPlaces() {
     return places;
-  }
-
-  public void addTransition(Transition transition) {
-    this.transitions.add(transition);
   }
 
   public List<Transition> getTransitions() {
     return transitions;
   }
 
-  public void addEdge(Edge<? extends Node, ? extends Node> edge) {
-    flow.add(edge);
-  }
-
   public List<Edge> getFlow() {
     return flow;
+  }
+
+  //TODO  return new Petrinet with an extra place
+  //TODO: change vector mue 0
+  private void addPlace(Place place) {
+    places.add(place);
+  }
+
+  private void addTransition(Transition transition) {
+    this.transitions.add(transition);
+  }
+
+  private void addEdge(Edge<? extends Node, ? extends Node> edge) {
+    flow.add(edge);
   }
 
   /**
@@ -106,12 +106,10 @@ public class Petrinet {
         );
       }
     });
-    System.out.println(pathsFromPlace.toString());
-    pathsFromPlace.forEach(this::addConnectedPlaces);
-    System.out.println(pathsFromPlace.toString());
   }
 
-  private void addConnectedPlaces(Place place, Set<Place> alreadyConnectedPlaces) {
+  // wip, does not work
+  /* private void addConnectedPlaces(Place place, Set<Place> alreadyConnectedPlaces) {
     // schaue für jede bisherige erreichbare stelle, was ihre nächsten stellen sind
     alreadyConnectedPlaces.forEach(connectedPlace -> {
       //set der nächsten erreichbaren stellen von connected place
@@ -120,18 +118,14 @@ public class Petrinet {
           pathsFromPlace.keySet().stream()
               .filter(connectedPlace::equals)
               .findFirst()
-              .get());
-      setOfNextPlaces = setOfNextPlaces.stream()
-          //filtere die nächsten erreichbaren stellen, dass es noch keine in already connected gibt
+              .get()).stream()
           .filter(p -> alreadyConnectedPlaces.stream().noneMatch(p::equals))
           .collect(Collectors.toSet());
+
       // wenn neue stellen dabei
       System.out.println(place + " " + setOfNextPlaces.toString());
       if (setOfNextPlaces.size() > 0) {
         //füge diese zu already connected hinzu
-        alreadyConnectedPlaces.addAll(setOfNextPlaces);
-        addConnectedPlaces(place, alreadyConnectedPlaces);
-      } else {
         //stellen sind final, also füge folgestellen zur map hinzu
         places.stream()
             //mappe auf die stellen ihre sets
@@ -145,13 +139,13 @@ public class Petrinet {
             //füge die neuen places hinzu
             .forEach(p -> {
               pathsFromPlace.get(places.stream().filter(place::equals).findFirst().get())
-                  .addAll(alreadyConnectedPlaces);
+                  .addAll(setOfNextPlaces);
             });
         pathsFromPlace.get(places.stream().filter(place::equals).findFirst().get())
-            .addAll(alreadyConnectedPlaces);
+            .addAll(setOfNextPlaces);
       }
     });
-  }
+  } */
 
   /**
    * A petrinet is correct if: places and transitions are finite, linearly ordered, t contains at
@@ -183,19 +177,39 @@ public class Petrinet {
         .count() == places.size();
   }
 
+  /**
+   * Check if net is strong connected.
+   *
+   * @return - true, when strongly connected
+   */
   public boolean isStronglyConnected() {
-    return places.stream().allMatch(this::isConnectedToEveryPlace);
+    return flow.stream().allMatch(this::hasReversedPath);
+  }
+
+  private boolean hasReversedPath(Edge edge) {
+    return flow.stream().filter(edge2 -> edge2.getFrom().equals(edge.getTo())).anyMatch(
+        edge2 -> edge2.getTo() == edge.getFrom() || hasReversedPath(edge2.getTo(), edge.getFrom()));
+  }
+
+  private boolean hasReversedPath(Node from, Node to) {
+    return flow.stream().filter(edge2 -> edge2.getFrom().equals(to)).anyMatch(
+        edge2 -> edge2.getTo() == from || hasReversedPath(edge2.getTo(), to));
   }
 
   private boolean isConnectedToEveryPlace(Place place) {
-    return
-        places.stream().filter(p -> pathsFromPlace.get(place).stream().anyMatch(p::equals)).count()
-            == places.size();
+    return places.stream().allMatch(p -> pathsFromPlace.get(place).stream().anyMatch(p::equals));
   }
 
+  /**
+   * Checks the petrinet for loops. A loop goes to a transition and vice versa.
+   *
+   * @return true when any edge has a reversed pair
+   */
   public boolean containsLoop() {
-    //TODO: implement
-    return false;
+    return flow.stream()
+        .anyMatch(edgeTowards -> flow.stream()
+            .anyMatch(edgeBackwards -> edgeTowards.getTo().equals(edgeBackwards.getFrom())
+                && edgeTowards.getFrom().equals(edgeBackwards.getTo())));
   }
 
   /**
