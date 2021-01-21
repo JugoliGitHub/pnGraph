@@ -43,6 +43,7 @@ public class Petrinet {
     setVectors();
     setInitialBoundedness();
     setPaths();
+    //TODO: create coverability graph in here
   }
 
   public Marking getMue0() {
@@ -192,8 +193,8 @@ public class Petrinet {
   }
 
   private boolean hasReversedPath(Node from, Node to) {
-    return flow.stream().filter(edge2 -> edge2.getFrom().equals(to)).anyMatch(
-        edge2 -> edge2.getTo() == from || hasReversedPath(edge2.getTo(), to));
+    return flow.stream().filter(nextEdge -> nextEdge.getFrom().equals(to)).anyMatch(
+        nextEdge -> nextEdge.getTo() == from || hasReversedPath(nextEdge.getTo(), to));
   }
 
   private boolean isConnectedToEveryPlace(Place place) {
@@ -210,6 +211,15 @@ public class Petrinet {
         .anyMatch(edgeTowards -> flow.stream()
             .anyMatch(edgeBackwards -> edgeTowards.getTo().equals(edgeBackwards.getFrom())
                 && edgeTowards.getFrom().equals(edgeBackwards.getTo())));
+  }
+
+  /**
+   * Checks whether this net is alive and bounded. If so, you can call it well-formed.
+   *
+   * @return - true, when it is well-formed
+   */
+  public boolean isWellFormed() {
+    return getLiveness() == 2 && getBoundedness() >= 0;
   }
 
   /**
