@@ -1,5 +1,4 @@
 import graphs.Petrinet;
-import java.util.Arrays;
 
 /**
  * This class is for quick testing inside my IDE.
@@ -52,9 +51,11 @@ public class Playground {
     //System.out.println(p.containsLoop());
 
     Petrinet p = PetriReader
-        .createPetriNetAndMarkings("s1:t2,t2;s2:;s3:t1;s4:t1;;t1:s1;t2:s2,s3,s4;;", "1,0,1,1");
+        .createPetriNetAndMarkings(
+            "s1:t1;s2:t1;s3:t2,t2;s4:t4;s5:t3;;t1:s4,s5,s5;t2:s1,s2,s4;t3:s3;t4:;;",
+            "2,1,0,0,1");
 
-    System.out.println(Arrays.toString(p.getIncidenceMatrix().rowArray));
+    p.getIncidenceMatrix().transposed().minInvariants();
   }
 
 }

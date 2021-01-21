@@ -74,12 +74,29 @@ public class Vector {
     this(Stream.of(markings).mapToInt(Integer::parseInt).toArray());
   }
 
+  public static int ggT(Vector vector) {
+    int a = vector.vectorArray[0];
+    int b = 0;
+    for (int i = 1; i < vector.length; i++) {
+      b = vector.vectorArray[i];
+      while (b != 0) {
+        b = a % (a = b);
+      }
+    }
+    return a;
+  }
+
   public int getLength() {
     return length;
   }
 
   public int get(int i) {
     return vectorArray[i];
+  }
+
+  public Vector multiply(int factor) {
+    return new Vector(
+        Arrays.stream(vectorArray).map(j -> j * factor).toArray());
   }
 
   /**

@@ -116,7 +116,7 @@ public class CoverabilityGraph {
    */
   protected Optional<Marking> fire(Marking mue, Transition transition)
       throws WrongDimensionException {
-    if (!mue.sub(transition.getPreSet()).equals(new Marking(0))) {
+    if (transition.getPreSet().lessEquals(mue)) {
       Marking newMue = mue.sub(transition.getPreSet()).add(transition.getPostSet());
       setBoundednessOfPlaces(mue, newMue);
       if (transition.isDead()) {

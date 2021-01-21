@@ -104,12 +104,12 @@ public class Petrinet {
         transitions.forEach(transition -> transition.setVectors(flow, places, places.size())))
         .start();
     forwardMatrix = new Matrix(transitions.stream().map(t -> t.getPostSet().vector()).toArray(
-        Vector[]::new));
+        Vector[]::new), false);
     backwardMatrix = new Matrix(transitions.stream().map(t -> t.getPreSet().vector()).toArray(
-        Vector[]::new));
+        Vector[]::new), false);
     incidenceMatrix = forwardMatrix = new Matrix(
         transitions.stream().map(t -> t.getPostSet().vector().sub(t.getPreSet().vector())).toArray(
-            Vector[]::new));
+            Vector[]::new), false);
   }
 
   /**
