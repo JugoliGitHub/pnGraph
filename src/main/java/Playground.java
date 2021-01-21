@@ -1,4 +1,5 @@
-import graphs.Petrinet;
+import graphs.objects.Matrix;
+import java.util.Arrays;
 
 /**
  * This class is for quick testing inside my IDE.
@@ -34,8 +35,8 @@ public class Playground {
     List<Edge> flow = fl.stream().map(Edge::reverse).collect(Collectors.toList());
     System.out.println(flow.toString());
     System.out.println(fl.toString()); */
-    Petrinet p = PetriReader
-        .createPetriNetAndMarkings("s1:a,b;s2:c;s3:d;s4:;;a:s2;b:s3;c:s2,s3;d:s2,s4;;", "1,0,0,0");
+    //Petrinet p = PetriReader
+      //  .createPetriNetAndMarkings("s1:a,b;s2:c;s3:d;s4:;;a:s2;b:s3;c:s2,s3;d:s2,s4;;", "1,0,0,0");
         //.createPetriNetAndMarkings("s1:a;s2:b;;a:s2;b:s1;;", "1,0");
         //.createPetriNetAndMarkings("s1:a;s2:b;s3:c;;a:s2;b:s3;c:s1;;", "1,0,0");
         //.createPetriNetAndMarkings("s1:a;;a:s1;;", "1");
@@ -47,8 +48,16 @@ public class Playground {
     //"1,0,0");
     // System.out.println(p.isStronglyConnected());
     //System.out.println(p.toString());
-    System.out.println(p.isStronglyConnected());
-    System.out.println(p.containsLoop());
+    //System.out.println(p.isStronglyConnected());
+    //System.out.println(p.containsLoop());
+
+    int[][] mat = new int[][]{{0, 1}, {2, 3}};
+    Matrix test = new Matrix(mat);
+
+    System.out.println(test.getRow(0));
+    System.out.println(Arrays.toString(test.colArray));
+
+    System.out.println(Arrays.toString(test.transposed().rowArray));
   }
 
 }
