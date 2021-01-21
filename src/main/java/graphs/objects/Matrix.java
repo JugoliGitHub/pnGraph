@@ -24,8 +24,21 @@ public class Matrix {
     this.m = cols.length;
   }
 
+  public Matrix(Vector[] cols) {
+    this.n = cols.length;
+    this.m = cols[0].getLength();
+    colArray = cols;
+    rowArray = fillRows(cols);
+  }
+
   private Vector[] fillRows(int[][] matrix) {
     return IntStream.range(0, m).mapToObj(row -> new Vector(matrix[row])).toArray(Vector[]::new);
+  }
+
+  private Vector[] fillRows(Vector[] cols) {
+    return IntStream.range(0, n)
+        .mapToObj(col -> new Vector(IntStream.range(0, m).map(row -> cols[col].get(row)).toArray()))
+        .toArray(Vector[]::new);
   }
 
   private Vector[] fillColumns(int[][] matrix) {

@@ -1,6 +1,8 @@
 package graphs;
 
 import graphs.objects.Marking;
+import graphs.objects.Matrix;
+import graphs.objects.Vector;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Node;
 import graphs.objects.nodes.Place;
@@ -22,6 +24,10 @@ public class Petrinet {
   protected final Marking mue0;
 
   protected final Map<Place, Set<Place>> pathsFromPlace;
+
+  protected Matrix incidenceMatrix;
+  protected Matrix forwardMatrix;
+  protected Matrix backwardMatrix;
 
   /**
    * Creates an empty petrinet. Should initialize mue0, capacity (if present) and places,
@@ -62,6 +68,18 @@ public class Petrinet {
     return flow;
   }
 
+  public Matrix getBackwardMatrix() {
+    return backwardMatrix;
+  }
+
+  public Matrix getForwardMatrix() {
+    return forwardMatrix;
+  }
+
+  public Matrix getIncidenceMatrix() {
+    return incidenceMatrix;
+  }
+
   //TODO  return new Petrinet with an extra place
   //TODO: change vector mue 0
   private void addPlace(Place place) {
@@ -85,6 +103,13 @@ public class Petrinet {
     new Thread(() ->
         transitions.forEach(transition -> transition.setVectors(flow, places, places.size())))
         .start();
+    forwardMatrix = new Matrix(transitions.stream().map(t -> t.getPostSet().vector()).toArray(
+        Vector[]::new));
+    backwardMatrix = new Matrix(transitions.stream().map(t -> t.getPreSet().vector()).toArray(
+        Vector[]::new));
+    incidenceMatrix = forwardMatrix = new Matrix(
+        transitions.stream().map(t -> t.getPostSet().vector().sub(t.getPreSet().vector())).toArray(
+            Vector[]::new));
   }
 
   /**

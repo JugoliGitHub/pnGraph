@@ -304,6 +304,10 @@ public class Marking {
     return new Marking(vectorArray.clone());
   }
 
+  public Vector vector() {
+    return new Vector(this.vectorArray);
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
