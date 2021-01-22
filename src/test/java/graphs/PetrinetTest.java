@@ -47,7 +47,7 @@ public class PetrinetTest {
 
   @Test
   void createNetWithWrongMue0ThrowsException() {
-    Mockito.when(mue0.getLength()).thenReturn(0);
+    Mockito.when(mue0.getDimension()).thenReturn(0);
 
     try {
       pn = new Petrinet("petrinet", places, transitions, flow, mue0);
@@ -58,11 +58,11 @@ public class PetrinetTest {
 
   @Test
   void createNetWithNoTransitionsThrowsException() {
-    Mockito.when(mue0.getLength()).thenReturn(1);
+    Mockito.when(mue0.getDimension()).thenReturn(1);
     transitions.remove(transition1);
 
     //check other options, so only the one is not correct
-    assertEquals(mue0.getLength(), places.size());
+    assertEquals(mue0.getDimension(), places.size());
 
     try {
       pn = new Petrinet("petrinet", places, transitions, flow, mue0);
@@ -73,11 +73,11 @@ public class PetrinetTest {
 
   @Test
   void createNetWithNoConnectionThrowsException() {
-    Mockito.when(mue0.getLength()).thenReturn(1);
+    Mockito.when(mue0.getDimension()).thenReturn(1);
     flow.remove(0);
 
     //check other options, so only the one is not correct
-    assertTrue(transitions.size() > 0 && mue0.getLength() == places.size());
+    assertTrue(transitions.size() > 0 && mue0.getDimension() == places.size());
 
     try {
       pn = new Petrinet("petrinet", places, transitions, flow, mue0);

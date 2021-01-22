@@ -96,7 +96,7 @@ public class CoverabilityGraph {
 
   protected void setBoundednessOfPlaces(Marking mue, Marking newMue) {
     if (!newMue.equals(mue)) {
-      IntStream.range(0, mue.getLength()).forEach(i -> {
+      IntStream.range(0, mue.getDimension()).forEach(i -> {
         if (petrinet.getPlaces().get(i).getBoundedness() == -1 || newMue.get(i) == -1) {
           petrinet.getPlaces().get(i).setBoundedness(-1);
         } else if (petrinet.getPlaces().get(i).getBoundedness() < newMue.get(i)) {
@@ -117,7 +117,7 @@ public class CoverabilityGraph {
   protected Optional<Marking> fire(Marking mue, Transition transition)
       throws WrongDimensionException {
     if (transition.getPreSet().lessEquals(mue)) {
-      Marking newMue = mue.sub(transition.getPreSet()).add(transition.getPostSet());
+      Marking newMue = (Marking) mue.sub(transition.getPreSet()).add(transition.getPostSet());
       setBoundednessOfPlaces(mue, newMue);
       if (transition.isDead()) {
         transition.setLiveness(0);
@@ -156,7 +156,7 @@ public class CoverabilityGraph {
         if (newMue.containsOmega()) {
           transition.setLiveness(1);
         }
-        IntStream.range(0, newMue.getLength())
+        IntStream.range(0, newMue.getDimension())
             .forEach(i -> petrinet.getPlaces().get(i).setBoundednessIfHigher(newMue.get(i)));
         addToMarkings(newMue);
         addToKnots(new CoverabilityGraphEdge(mue, transition, newMue));

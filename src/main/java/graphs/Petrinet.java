@@ -1,8 +1,8 @@
 package graphs;
 
+import graphs.objects.IntVector;
 import graphs.objects.Marking;
 import graphs.objects.Matrix;
-import graphs.objects.Vector;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Node;
 import graphs.objects.nodes.Place;
@@ -103,13 +103,13 @@ public class Petrinet {
     new Thread(() ->
         transitions.forEach(transition -> transition.setVectors(flow, places, places.size())))
         .start();
-    forwardMatrix = new Matrix(transitions.stream().map(t -> t.getPostSet().vector()).toArray(
-        Vector[]::new), false);
-    backwardMatrix = new Matrix(transitions.stream().map(t -> t.getPreSet().vector()).toArray(
-        Vector[]::new), false);
+    forwardMatrix = new Matrix(transitions.stream().map(Node::getPostSet).toArray(IntVector[]::new),
+        false);
+    backwardMatrix = new Matrix(transitions.stream().map(Node::getPreSet).toArray(
+        IntVector[]::new), false);
     incidenceMatrix = forwardMatrix = new Matrix(
-        transitions.stream().map(t -> t.getPostSet().vector().sub(t.getPreSet().vector())).toArray(
-            Vector[]::new), false);
+        transitions.stream().map(t -> t.getPostSet().sub(t.getPreSet())).toArray(
+            IntVector[]::new), false);
   }
 
   /**
@@ -184,7 +184,7 @@ public class Petrinet {
   }
 
   private boolean isSameLength() {
-    return mue0.getLength() == places.size();
+    return mue0.getDimension() == places.size();
   }
 
   private boolean isConnected() {

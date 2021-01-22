@@ -211,8 +211,8 @@ public class PetriReader {
       throw new IllegalArgumentException("The pn-string needs the right format.");
     }
 
-    if (capacity.getLength() == places.size()) {
-      for (int i = 0; i < capacity.getLength(); i++) {
+    if (capacity.getDimension() == places.size()) {
+      for (int i = 0; i < capacity.getDimension(); i++) {
         places.get(i).setCapacity(capacity.get(i));
       }
       return new PetrinetWithCapacity("petrinet", places, transitions, flow, mue0, capacity);

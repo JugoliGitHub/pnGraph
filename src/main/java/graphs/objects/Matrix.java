@@ -2,13 +2,15 @@ package graphs.objects;
 
 import exception.WrongDimensionException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Matrix {
 
-  public final Vector[] rowArray;
-  public final Vector[] colArray;
+  public final IntVector[] rowArray;
+  public final IntVector[] colArray;
 
   private final int n;
   private final int m;
@@ -20,10 +22,10 @@ public class Matrix {
     colArray = fillColumns(matrix);
   }
 
-  private Matrix(Vector[] rows, Vector[] cols) {
+  private Matrix(IntVector[] rows, IntVector[] cols) {
     this.rowArray = rows;
     this.colArray = cols;
-    this.n = rows[0].getLength();
+    this.n = rows[0].getDimension();
     this.m = rows.length;
   }
 
@@ -41,22 +43,22 @@ public class Matrix {
           newRow[i + left.n] = right.get(row, i);
         }
       }
-      return new Vector(newRow);
-    }).toArray(Vector[]::new);
-    this.n = rowArray[0].getLength();
+      return new IntVector(newRow);
+    }).toArray(IntVector[]::new);
+    this.n = rowArray[0].getDimension();
     this.m = rowArray.length;
     colArray = fillColumns(rowArray);
   }
 
-  public Matrix(Vector[] rows, boolean row) {
+  public Matrix(IntVector[] rows, boolean row) {
     if (row) {
-      this.n = rows[0].getLength();
+      this.n = rows[0].getDimension();
       this.m = rows.length;
       rowArray = rows;
       colArray = fillColumns(rows);
     } else {
       this.n = rows.length;
-      this.m = rows[0].getLength();
+      this.m = rows[0].getDimension();
       colArray = rows;
       rowArray = fillRows(rows);
     }
@@ -68,26 +70,26 @@ public class Matrix {
         .toArray(int[][]::new));
   }
 
-  private Vector[] fillRows(int[][] matrix) {
-    return IntStream.range(0, m).mapToObj(row -> new Vector(matrix[row])).toArray(Vector[]::new);
+  private IntVector[] fillRows(int[][] matrix) {
+    return IntStream.range(0, m).mapToObj(row -> new IntVector(matrix[row])).toArray(IntVector[]::new);
   }
 
-  private Vector[] fillRows(Vector[] cols) {
+  private IntVector[] fillRows(IntVector[] cols) {
     return IntStream.range(0, m)
-        .mapToObj(row -> new Vector(IntStream.range(0, n).map(col -> cols[col].get(row)).toArray()))
-        .toArray(Vector[]::new);
+        .mapToObj(row -> new IntVector(IntStream.range(0, n).map(col -> cols[col].get(row)).toArray()))
+        .toArray(IntVector[]::new);
   }
 
-  private Vector[] fillColumns(int[][] matrix) {
+  private IntVector[] fillColumns(int[][] matrix) {
     return IntStream.range(0, n)
-        .mapToObj(col -> new Vector(IntStream.range(0, m).map(row -> matrix[row][col]).toArray()))
-        .toArray(Vector[]::new);
+        .mapToObj(col -> new IntVector(IntStream.range(0, m).map(row -> matrix[row][col]).toArray()))
+        .toArray(IntVector[]::new);
   }
 
-  private Vector[] fillColumns(Vector[] rows) {
+  private IntVector[] fillColumns(IntVector[] rows) {
     return IntStream.range(0, n)
-        .mapToObj(col -> new Vector(IntStream.range(0, m).map(row -> rows[row].get(col)).toArray()))
-        .toArray(Vector[]::new);
+        .mapToObj(col -> new IntVector(IntStream.range(0, m).map(row -> rows[row].get(col)).toArray()))
+        .toArray(IntVector[]::new);
   }
 
   public int getM() {
@@ -98,16 +100,16 @@ public class Matrix {
     return n;
   }
 
-  public Vector getRow(int s) {
+  public IntVector getRow(int s) {
     if (s < 0 || s >= m) {
-      return new Vector(m);
+      return new IntVector(m);
     }
     return rowArray[s];
   }
 
-  public Vector getColumn(int t) {
+  public IntVector getColumn(int t) {
     if (t < 0 || t >= n) {
-      return new Vector(n);
+      return new IntVector(n);
     }
     return rowArray[t];
   }
@@ -144,11 +146,11 @@ public class Matrix {
     System.out.println(stepString.toString());
   }
 
-  public void minInvariants() {
+  public List<IntVector> minInvariants() {
     Matrix di = new Matrix(this.copy(), identityMatrix(m));
     printStep(di, 0);
     for (int i = 0; i < n; i++) {
-      List<Vector> nextStepMatrix = new ArrayList<>();
+      List<IntVector> nextStepMatrix = new ArrayList<>();
       List<Integer> leftRowsIndices = new ArrayList<>();
       for (int j = 0; j < di.getM(); j++) {
         if (di.get(j, i) == 0) {
@@ -160,18 +162,21 @@ public class Matrix {
       for (Integer j : leftRowsIndices) {
         for (Integer k : leftRowsIndices) {
           if (di.get(j, i) * di.get(k, i) < 0) {
-            Vector w = di.rowArray[j].multiply(Math.abs(di.get(k, i)))
+            IntVector w = (IntVector) di.rowArray[j].multiply(Math.abs(di.get(k, i)))
                 .add(di.rowArray[k].multiply(Math.abs(di.get(j, i))));
-            w = w.multiply(1 / Vector.ggT(w));
-            Vector finalW = w.copy();
+            w = (IntVector) w.multiply(1 / IntVector.ggT(w));
+            IntVector finalW = (IntVector) w.copy();
             if (nextStepMatrix.stream().noneMatch(row -> row.equals(finalW))) {
               nextStepMatrix.add(w);
             }
           }
         }
       }
-      di = new Matrix(nextStepMatrix.toArray(Vector[]::new), true);
+      di = new Matrix(nextStepMatrix.toArray(IntVector[]::new), true);
       printStep(di, i + 1);
     }
+    return Arrays.stream(di.rowArray)
+        .map(row -> new IntVector(IntStream.range(0, m).map(i -> row.get(i + n)).toArray())).collect(
+            Collectors.toList());
   }
 }

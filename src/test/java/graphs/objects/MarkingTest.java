@@ -58,7 +58,7 @@ public class MarkingTest {
   void createMarkingWithOneValueWorks() {
     marking = new Marking(2, 0);
 
-    assertEquals(2, marking.getLength());
+    assertEquals(2, marking.getDimension());
     assertEquals(0, marking.get(0));
     assertEquals(0, marking.get(1));
   }
@@ -67,7 +67,7 @@ public class MarkingTest {
   void createNullMarkingWorks() {
     marking = new Marking(1);
 
-    assertEquals(1, marking.getLength());
+    assertEquals(1, marking.getDimension());
     assertEquals(0, marking.get(0));
   }
 
@@ -84,7 +84,7 @@ public class MarkingTest {
   void createMarkingWithArrayWorks() {
     marking = new Marking(new int[]{0, 1, -1, 2});
 
-    assertEquals(4, marking.getLength());
+    assertEquals(4, marking.getDimension());
     assertEquals(0, marking.get(0));
     assertEquals(1, marking.get(1));
     assertEquals(-1, marking.get(2));
@@ -219,9 +219,9 @@ public class MarkingTest {
 
   @Test
   void addingWithNormalValuesWorks() {
-    marking = marking1.add(marking1);
+    marking = (Marking) marking1.add(marking1);
 
-    assertEquals(3, marking.getLength());
+    assertEquals(3, marking.getDimension());
     assertEquals(marking1.get(0) + marking1.get(0), marking.get(0));
     assertEquals(marking1.get(1) + marking1.get(1), marking.get(1));
     assertEquals(marking1.get(2) + marking1.get(2), marking.get(2));
@@ -229,9 +229,9 @@ public class MarkingTest {
 
   @Test
   void addingWithOmegaWorks() {
-    marking = marking3.add(marking4);
+    marking = (Marking) marking3.add(marking4);
 
-    assertEquals(2, marking.getLength());
+    assertEquals(2, marking.getDimension());
     assertEquals(-1, marking.get(0));
     assertEquals(-1, marking.get(1));
   }
