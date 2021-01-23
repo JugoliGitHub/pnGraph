@@ -3,6 +3,7 @@ package graphs;
 import graphs.objects.IntVector;
 import graphs.objects.Marking;
 import graphs.objects.Matrix;
+import graphs.objects.Vector;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Node;
 import graphs.objects.nodes.Place;
@@ -103,13 +104,13 @@ public class Petrinet {
     new Thread(() ->
         transitions.forEach(transition -> transition.setVectors(flow, places, places.size())))
         .start();
-    forwardMatrix = new Matrix(transitions.stream().map(Node::getPostSet).toArray(IntVector[]::new),
-        false);
-    backwardMatrix = new Matrix(transitions.stream().map(Node::getPreSet).toArray(
-        IntVector[]::new), false);
-    incidenceMatrix = forwardMatrix = new Matrix(
-        transitions.stream().map(t -> t.getPostSet().sub(t.getPreSet())).toArray(
-            IntVector[]::new), false);
+    forwardMatrix = new Matrix(transitions.stream().map(t -> t.getPostSet().intVector())
+        .toArray(IntVector[]::new), false);
+    backwardMatrix = new Matrix(transitions.stream().map(t -> t.getPostSet().intVector())
+        .toArray(IntVector[]::new), false);
+    incidenceMatrix = new Matrix(
+        transitions.stream().map(t -> t.getPostSet().intVector().sub(t.getPreSet()))
+            .toArray(IntVector[]::new), false);
   }
 
   /**
@@ -320,6 +321,15 @@ public class Petrinet {
 
   public CoverabilityGraph createCoverabilityGraph() {
     return new CoverabilityGraph(mue0, this.name + "Cov", this);
+  }
+
+  public List<Vector> getTransitionInvariants() {
+    return incidenceMatrix.transposed().minInvariants();
+  }
+
+
+  public List<Vector> getPlaceInvariants() {
+    return incidenceMatrix.minInvariants();
   }
 
   @Override

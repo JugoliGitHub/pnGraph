@@ -1,7 +1,6 @@
 package graphs.objects.nodes;
 
 import graphs.objects.Marking;
-import graphs.objects.Vector;
 import graphs.objects.edges.Edge;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public abstract class Node {
    */
   public abstract void setVectors(List<Edge> flow, List<? extends Node> otherNodes, int dimension);
 
-  public Vector getPreSet() {
+  public Marking getPreSet() {
     return preSet;
   }
 
@@ -43,7 +42,7 @@ public abstract class Node {
     this.preSet = preSet;
   }
 
-  public Vector getPostSet() {
+  public Marking getPostSet() {
     return postSet;
   }
 

@@ -225,21 +225,6 @@ public class Marking implements Vector {
   }
 
   /**
-   * Returns a new vector with a value of omega at index.
-   *
-   * @param index integer between 0 (included) and the length (excluded)
-   * @return the new vector or an empty if operation not allowed
-   */
-  public Marking setOmega(int index) {
-    if (index >= 0 && index < length) {
-      int[] tmpVector = vectorArray.clone();
-      tmpVector[index] = -1;
-      return new Marking(tmpVector);
-    }
-    return new Marking(0);
-  }
-
-  /**
    * Returns a copy of this vector.
    *
    * @return a new marking with the same values
@@ -272,6 +257,11 @@ public class Marking implements Vector {
         }
       }
     }
+  }
+
+  public IntVector intVector() {
+    IntVector v = new IntVector(this.vectorArray.clone());
+    return v;
   }
 
   @Override

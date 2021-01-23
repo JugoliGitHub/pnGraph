@@ -71,24 +71,28 @@ public class Matrix {
   }
 
   private IntVector[] fillRows(int[][] matrix) {
-    return IntStream.range(0, m).mapToObj(row -> new IntVector(matrix[row])).toArray(IntVector[]::new);
+    return IntStream.range(0, m).mapToObj(row ->
+        new IntVector(matrix[row])).toArray(IntVector[]::new);
   }
 
-  private IntVector[] fillRows(IntVector[] cols) {
+  private IntVector[] fillRows(Vector[] cols) {
     return IntStream.range(0, m)
-        .mapToObj(row -> new IntVector(IntStream.range(0, n).map(col -> cols[col].get(row)).toArray()))
+        .mapToObj(row -> new IntVector(IntStream.range(0, n).map(col ->
+            cols[col].get(row)).toArray()))
         .toArray(IntVector[]::new);
   }
 
   private IntVector[] fillColumns(int[][] matrix) {
     return IntStream.range(0, n)
-        .mapToObj(col -> new IntVector(IntStream.range(0, m).map(row -> matrix[row][col]).toArray()))
+        .mapToObj(
+            col -> new IntVector(IntStream.range(0, m).map(row -> matrix[row][col]).toArray()))
         .toArray(IntVector[]::new);
   }
 
-  private IntVector[] fillColumns(IntVector[] rows) {
+  private IntVector[] fillColumns(Vector[] rows) {
     return IntStream.range(0, n)
-        .mapToObj(col -> new IntVector(IntStream.range(0, m).map(row -> rows[row].get(col)).toArray()))
+        .mapToObj(
+            col -> new IntVector(IntStream.range(0, m).map(row -> rows[row].get(col)).toArray()))
         .toArray(IntVector[]::new);
   }
 
@@ -146,7 +150,7 @@ public class Matrix {
     System.out.println(stepString.toString());
   }
 
-  public List<IntVector> minInvariants() {
+  public List<Vector> minInvariants() {
     Matrix di = new Matrix(this.copy(), identityMatrix(m));
     printStep(di, 0);
     for (int i = 0; i < n; i++) {
@@ -176,7 +180,7 @@ public class Matrix {
       printStep(di, i + 1);
     }
     return Arrays.stream(di.rowArray)
-        .map(row -> new IntVector(IntStream.range(0, m).map(i -> row.get(i + n)).toArray())).collect(
-            Collectors.toList());
+        .map(row -> new IntVector(IntStream.range(0, m).map(i -> row.get(i + n)).toArray()))
+        .collect(Collectors.toList());
   }
 }

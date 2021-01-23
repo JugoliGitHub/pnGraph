@@ -55,7 +55,7 @@ public class Playground {
             "s1:t1;s2:t1;s3:t2,t2;s4:t4;s5:t3;;t1:s4,s5,s5;t2:s1,s2,s4;t3:s3;t4:;;",
             "2,1,0,0,1");
 
-    p.getIncidenceMatrix().transposed().minInvariants();
+    System.out.println(p.getIncidenceMatrix().transposed().minInvariants().toString());
   }
 
 }
