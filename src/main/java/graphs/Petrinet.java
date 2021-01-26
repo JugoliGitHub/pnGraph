@@ -22,17 +22,14 @@ public class Petrinet {
   protected final List<Place> places;
   protected final List<Transition> transitions;
   protected final List<Edge> flow;
-  protected Marking mue0;
-
   protected final Map<Place, Set<Place>> pathsFromPlace;
-
+  protected Marking mue0;
   protected Matrix incidenceMatrix;
   protected Matrix forwardMatrix;
   protected Matrix backwardMatrix;
 
   /**
-   * Creates an empty petrinet. Should initialize mue0, capacity (if present) and places,
-   * transitions and flow.
+   * Creates an empty petrinet. Will initialize mue0, places, transitions and flow.
    *
    * @param name name of the net
    */
@@ -103,18 +100,23 @@ public class Petrinet {
    * Sets the start- and end-nodes for every node.
    */
   private void setVectors() {
-    new Thread(() ->
+    ThreadGroup group = new ThreadGroup("parallelPlacesAndTransitions");
+    new Thread(group, () ->
         places.forEach(place -> place.setVectors(flow, transitions, transitions.size()))).start();
-    new Thread(() ->
+    new Thread(group, () ->
         transitions.forEach(transition -> transition.setVectors(flow, places, places.size())))
         .start();
-    forwardMatrix = new Matrix(transitions.stream().map(t -> t.getPostSet().intVector())
-        .toArray(IntVector[]::new), false);
-    backwardMatrix = new Matrix(transitions.stream().map(t -> t.getPostSet().intVector())
-        .toArray(IntVector[]::new), false);
-    incidenceMatrix = new Matrix(
-        transitions.stream().map(t -> t.getPostSet().intVector().sub(t.getPreSet()))
-            .toArray(IntVector[]::new), false);
+
+    if (group.activeCount() == 0) {
+      forwardMatrix = new Matrix(transitions.stream().map(t -> t.getPostSet().intVector())
+          .toArray(IntVector[]::new), false);
+      backwardMatrix = new Matrix(transitions.stream().map(t -> t.getPostSet().intVector())
+          .toArray(IntVector[]::new), false);
+      incidenceMatrix = new Matrix(transitions.stream()
+          .map(t -> t.getPostSet().intVector().sub(t.getPreSet()))
+          .toArray(IntVector[]::new), false);
+    }
+
   }
 
   /**

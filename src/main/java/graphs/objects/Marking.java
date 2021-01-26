@@ -124,15 +124,16 @@ public class Marking implements Vector {
 
   @Override
   public Marking add(int index, int value) {
-    if (index < vectorArray.length && index > 0) {
-      if (value < 0 || vectorArray[index] != -1) {
+    if (index < vectorArray.length && index >= 0) {
+      if (value < 0) {
         return new Marking(0);
       } else {
+        if (vectorArray[index] == -1) {
+          return this;
+        }
         int[] newArray = vectorArray.clone();
         newArray[index] += value;
-        if (newArray[index] >= 0) {
-          return new Marking(newArray);
-        }
+        return new Marking(newArray);
       }
     }
     return new Marking(0);

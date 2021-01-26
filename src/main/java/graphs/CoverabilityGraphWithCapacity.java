@@ -10,7 +10,7 @@ import java.util.Optional;
  * A sub-class of coverability-graph. It can only fire when the capacity is complied with the new
  * marking.
  */
-public class LabelledTransitionSystemWithCapacity extends CoverabilityGraph {
+public class CoverabilityGraphWithCapacity extends CoverabilityGraph {
 
   private final Marking capacity;
 
@@ -21,7 +21,7 @@ public class LabelledTransitionSystemWithCapacity extends CoverabilityGraph {
    * @param name     name of the graph
    * @param petrinet corresponding petrinet
    */
-  public LabelledTransitionSystemWithCapacity(Marking mue0, String name, PetrinetWithCapacity petrinet)
+  public CoverabilityGraphWithCapacity(Marking mue0, String name, PetrinetWithCapacity petrinet)
       throws WrongDimensionException {
     super(mue0, name);
     this.petrinet = petrinet;
@@ -42,7 +42,7 @@ public class LabelledTransitionSystemWithCapacity extends CoverabilityGraph {
     } else if (transition.getPreSet().lessEquals(mue)
         && newMue.sub(transition.getPreSet()).add(transition.getPostSet())
         .lessEquals(capacity)) {
-      newMue = (Marking) newMue.sub(transition.getPreSet()).add(transition.getPostSet());
+      newMue = newMue.sub(transition.getPreSet()).add(transition.getPostSet());
       setBoundednessOfPlaces(mue, newMue);
     } else {
       return Optional.empty();

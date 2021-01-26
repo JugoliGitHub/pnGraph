@@ -1,4 +1,9 @@
-import graphs.Petrinet;
+import graphs.PetrinetWithCapacity;
+import graphs.objects.Marking;
+import graphs.objects.edges.Edge;
+import graphs.objects.nodes.Place;
+import graphs.objects.nodes.Transition;
+import java.util.List;
 
 /**
  * This class is for quick testing inside my IDE.
@@ -58,12 +63,27 @@ t1:s1,s2;t2:s2,s3;t3:s4;t4:s7,s8;t5:s5;t6:s4;t7:s5;t8:s4,s6;t9:s5,s9;;",
 
     System.out.println(p.getTransitionInvariants().toString());*/
 
-    Petrinet p = PetriReader
-        .createPetriNetAndMarkings(
-            "s1:t3;s2:t4;s3:t5;s4:t1,t4;s5:t2,t4;s6:t3;s7:t6,t8;s8:t7,t9;s9:t5;;t1:s1,s2;t2:s2,s3;t3:s4;t4:s7,s8;t5:s5;t6:s4;t7:s5;t8:s4,s6;t9:s5,s9;;",
-            "0,0,0,0,0,1,1,1,1");
+   // Petrinet p = PetriReader
+     //   .createPetriNetAndMarkings(
+       //     "s1:t3;s2:t4;s3:t5;s4:t1,t4;s5:t2,t4;s6:t3;s7:t6,t8;s8:t7,t9;s9:t5;;t1:s1,s2;t2:s2,s3;t3:s4;t4:s7,s8;t5:s5;t6:s4;t7:s5;t8:s4,s6;t9:s5,s9;;",
+         //   "0,0,0,0,0,1,1,1,1");
+    //System.out.println(p.getMinimalSiphons().toString());
 
-    System.out.println(p.getMinimalSiphons().toString());
+    Place s1 = new Place("s1");
+    Place s2 = new Place("s2");
+    Transition t1 = new Transition("t1");
+    Transition t2 = new Transition("t2");
+    Transition t3 = new Transition("t3");
+    PetrinetWithCapacity petrinetWithCapacity = new PetrinetWithCapacity("p",
+        List.of(s1, s2),
+        List.of(t1, t2, t3),
+        List.of(new Edge(s1, t1), new Edge(t1, s2), new Edge(s2, t2), new Edge(s2, t3), new Edge(t3, s1)),
+        new Marking(new int[]{1, 1}),
+        new Marking(new int[]{2, 1}));
+    System.out.println(petrinetWithCapacity.toString());
+    System.out.println(petrinetWithCapacity.createCoverabilityGraph().toString());
+    System.out.println(petrinetWithCapacity.getPetrinet().toString());
+    System.out.println(petrinetWithCapacity.getPetrinet().getMue0().toString());
   }
 
 }

@@ -4,7 +4,10 @@ import graphs.objects.Marking;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class PetrinetWithCapacity extends SimpleNet {
 
@@ -20,6 +23,8 @@ public class PetrinetWithCapacity extends SimpleNet {
       List<Edge> flow, Marking mue0, Marking capacity) {
     super(name, places, transitions, flow, mue0);
     this.capacity = capacity;
+    IntStream.range(0, places.size()).forEach(i -> places.get(i).setBoundedness(capacity.get(i)));
+    IntStream.range(0, places.size()).forEach(i -> places.get(i).setCapacity(capacity.get(i)));
   }
 
   public Marking getCapacity() {
@@ -27,10 +32,40 @@ public class PetrinetWithCapacity extends SimpleNet {
   }
 
   @Override
-  protected void setInitialBoundedness() {
+  public CoverabilityGraph createCoverabilityGraph() {
+    return new CoverabilityGraphWithCapacity(mue0, this.name + "Cov", this);
+  }
+
+  /**
+   * Returns a new petrinet without capacity.
+   *
+   * @return a new petrinet
+   */
+  public Petrinet getPetrinet() {
+    List<Place> newPlaces = new ArrayList<>(places);
+    newPlaces
+        .addAll(places.stream().map(place -> new Place(place.getLabel() + "c")).collect(
+            Collectors.toList()));
+
+    Marking newMue0 = new Marking(places.size() * 2);
     for (int i = 0; i < places.size(); i++) {
-      places.get(i).setBoundedness(capacity.get(i));
+      newMue0 = newMue0.add(i, mue0.get(i));
+      newMue0 = newMue0.add(places.size() + i, places.get(i).getCapacity() - mue0.get(i));
     }
+
+    List<Edge> newFlow = new ArrayList<>(flow);
+    newFlow.addAll(flow.stream().map(edge -> {
+      if (edge.getFrom() instanceof Place) {
+        return new Edge<>(edge.getTo(),
+            newPlaces.get(places.indexOf((Place) edge.getFrom()) + places.size()));
+      } else {
+        return new Edge<>(newPlaces.get(places.indexOf((Place) edge.getTo()) + places.size()),
+            edge.getFrom());
+      }
+    }).collect(Collectors.toList()));
+
+    return new Petrinet(this.name + "Complement", newPlaces, new ArrayList<>(transitions),
+        newFlow, newMue0);
   }
 
 }

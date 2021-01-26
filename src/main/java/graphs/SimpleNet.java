@@ -17,6 +17,7 @@ import java.util.stream.IntStream;
 
 public class SimpleNet extends Petrinet {
 
+
   /**
    * Creates an empty petrinet. Should initialize mue0, capacity (if present) and places, transitions
    * and flow.
@@ -37,12 +38,15 @@ public class SimpleNet extends Petrinet {
 
   @Override
   protected boolean isNotCorrect() {
-    return !isSameLength() || !(transitions.size() > 0) || !isConnected() || containsLoop()
+    return !isSameLength()
+        || !(transitions.size() > 0)
+        || !isConnected()
+        || containsLoop()
         || !containsMultiEdges();
   }
 
   private boolean containsMultiEdges() {
-    return false;
+    return true;
   }
 
   public List<Set<Place>> getMinimalSiphons() {
