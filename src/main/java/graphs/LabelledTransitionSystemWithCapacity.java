@@ -36,7 +36,7 @@ public class LabelledTransitionSystemWithCapacity extends CoverabilityGraph {
   protected Optional<Marking> fire(Marking mue, Transition transition)
       throws WrongDimensionException {
     Marking newMue = new Marking(mue.getDimension());
-    newMue = (Marking) newMue.add(mue);
+    newMue = newMue.add(mue);
     if (transition.getPostSet().getDimension() == 0 || transition.getPreSet().getDimension() == 0) {
       throw new IllegalArgumentException("Initialize in- and output first.");
     } else if (transition.getPreSet().lessEquals(mue)

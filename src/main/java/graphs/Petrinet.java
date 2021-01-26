@@ -22,7 +22,7 @@ public class Petrinet {
   protected final List<Place> places;
   protected final List<Transition> transitions;
   protected final List<Edge> flow;
-  protected final Marking mue0;
+  protected Marking mue0;
 
   protected final Map<Place, Set<Place>> pathsFromPlace;
 
@@ -55,6 +55,10 @@ public class Petrinet {
 
   public Marking getMue0() {
     return this.mue0;
+  }
+
+  public void setMue0(Marking mue0) {
+    this.mue0 = mue0;
   }
 
   public List<Place> getPlaces() {
@@ -135,45 +139,6 @@ public class Petrinet {
     });
   }
 
-  // wip, does not work
-  /* private void addConnectedPlaces(Place place, Set<Place> alreadyConnectedPlaces) {
-    // schaue für jede bisherige erreichbare stelle, was ihre nächsten stellen sind
-    alreadyConnectedPlaces.forEach(connectedPlace -> {
-      //set der nächsten erreichbaren stellen von connected place
-      Set<Place> setOfNextPlaces = pathsFromPlace.get(
-          // da connected place nicht das gleiche objekt, muss es gefiltert werden aus dem key set
-          pathsFromPlace.keySet().stream()
-              .filter(connectedPlace::equals)
-              .findFirst()
-              .get()).stream()
-          .filter(p -> alreadyConnectedPlaces.stream().noneMatch(p::equals))
-          .collect(Collectors.toSet());
-
-      // wenn neue stellen dabei
-      System.out.println(place + " " + setOfNextPlaces.toString());
-      if (setOfNextPlaces.size() > 0) {
-        //füge diese zu already connected hinzu
-        //stellen sind final, also füge folgestellen zur map hinzu
-        places.stream()
-            //mappe auf die stellen ihre sets
-            .map(p -> pathsFromPlace
-                .get(pathsFromPlace.keySet().stream()
-                    //finde wieder das richtige set für p
-                    .filter(p::equals)
-                    .findFirst().get()))
-            //schaue im nachbereich, ob place drin ist
-            .filter(set -> set.stream().anyMatch(place::equals))
-            //füge die neuen places hinzu
-            .forEach(p -> {
-              pathsFromPlace.get(places.stream().filter(place::equals).findFirst().get())
-                  .addAll(setOfNextPlaces);
-            });
-        pathsFromPlace.get(places.stream().filter(place::equals).findFirst().get())
-            .addAll(setOfNextPlaces);
-      }
-    });
-  } */
-
   /**
    * A petrinet is correct if: places and transitions are finite, linearly ordered, t contains at
    * least one element and the net is connected.
@@ -181,14 +146,14 @@ public class Petrinet {
    * @return true, when this net is correct
    */
   protected boolean isNotCorrect() {
-    return !isSameLength() || !(transitions.size() > 0) || !isConnected();
+    return !isSameLength() || !(transitions.size() > 0);
   }
 
-  private boolean isSameLength() {
+  protected final boolean isSameLength() {
     return mue0.getDimension() == places.size();
   }
 
-  private boolean isConnected() {
+  protected final boolean isConnected() {
     return transitions.stream()
         .filter(transition ->
             (int) flow.stream()
@@ -212,6 +177,8 @@ public class Petrinet {
   public boolean isStronglyConnected() {
     return flow.stream().allMatch(this::hasReversedPath);
   }
+
+  //TODO: structural liveness and deadlock-free
 
   private boolean hasReversedPath(Edge edge) {
     return flow.stream().filter(edge2 -> edge2.getFrom().equals(edge.getTo())).anyMatch(
@@ -258,8 +225,6 @@ public class Petrinet {
         .min(transitions.stream().map(Transition::getLiveness).collect(Collectors.toList()));
   }
 
-  //TODO: structural liveness and deadlock-free
-
   /**
    * Returns the maximal value of a bounded place.
    *
@@ -296,19 +261,6 @@ public class Petrinet {
         new Marking(newPlaces.size()));
   }
 
-  /**
-   * Return a dual-petrinet with markings.
-   *
-   * @param markings new combination of markings for new places
-   * @return a new petrinet but with markings
-   */
-  public Petrinet dual(Marking markings) {
-    List<Place> newPlaces = reverseTransitionsToPlaces();
-    List<Transition> newTransitions = reversePlacesToTransitions();
-    return new Petrinet(this.name + "Dual", newPlaces, newTransitions, List.copyOf(flow),
-        markings);
-  }
-
   private List<Place> reverseTransitionsToPlaces() {
     return transitions.stream().map(transition -> new Place(transition.getLabel()))
         .collect(Collectors.toList());
@@ -326,7 +278,6 @@ public class Petrinet {
   public List<Vector> getTransitionInvariants() {
     return incidenceMatrix.transposed().minInvariants();
   }
-
 
   public List<Vector> getPlaceInvariants() {
     return incidenceMatrix.minInvariants();

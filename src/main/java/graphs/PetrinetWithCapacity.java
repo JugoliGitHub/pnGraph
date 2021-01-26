@@ -6,7 +6,7 @@ import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
 import java.util.List;
 
-public class PetrinetWithCapacity extends Petrinet {
+public class PetrinetWithCapacity extends SimpleNet {
 
   private final Marking capacity;
 
@@ -20,9 +20,6 @@ public class PetrinetWithCapacity extends Petrinet {
       List<Edge> flow, Marking mue0, Marking capacity) {
     super(name, places, transitions, flow, mue0);
     this.capacity = capacity;
-    if (!isNotCorrect()) {
-      throw new IllegalArgumentException("This is no valid petrinet. The capacity is exceeded.");
-    }
   }
 
   public Marking getCapacity() {
@@ -36,11 +33,4 @@ public class PetrinetWithCapacity extends Petrinet {
     }
   }
 
-  /*for (int i = 0; i < places.size(); i++) {
-    if (mue0.get(i) > capacity.get(i)) {
-      throw new OutOfCapacityException("The start marking has "
-          + "to be less-equal than the capacity");
-    }
-    places.get(i).setBoundedness(mue0.get(i));
-  } */
 }
