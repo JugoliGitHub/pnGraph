@@ -259,6 +259,11 @@ public class Marking implements Vector {
     }
   }
 
+  @Override
+  public IntStream stream() {
+    return Arrays.stream(vectorArray);
+  }
+
   public IntVector intVector() {
     IntVector v = new IntVector(this.vectorArray.clone());
     return v;

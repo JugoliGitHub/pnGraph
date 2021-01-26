@@ -50,12 +50,20 @@ public class Playground {
     //System.out.println(p.isStronglyConnected());
     //System.out.println(p.containsLoop());
 
-    Petrinet p = PetriReader
+    /*Petrinet p = PetriReader
         .createPetriNetAndMarkings(
-            "s1:t1;s2:t1;s3:t2,t2;s4:t4;s5:t3;;t1:s4,s5,s5;t2:s1,s2,s4;t3:s3;t4:;;",
+            ""s1:t3;s2:t4;s3:t5;s4:t1,t4;s5:t2,t4;s6:t3;s7:t6,t8;s8:t7,t9;s9:t5;;
+t1:s1,s2;t2:s2,s3;t3:s4;t4:s7,s8;t5:s5;t6:s4;t7:s5;t8:s4,s6;t9:s5,s9;;",
             "2,1,0,0,1");
 
-    System.out.println(p.getIncidenceMatrix().transposed().minInvariants().toString());
+    System.out.println(p.getTransitionInvariants().toString());*/
+
+    Petrinet p = PetriReader
+        .createPetriNetAndMarkings(
+            "s1:t3;s2:t4;s3:t5;s4:t1,t4;s5:t2,t4;s6:t3;s7:t6,t8;s8:t7,t9;s9:t5;;t1:s1,s2;t2:s2,s3;t3:s4;t4:s7,s8;t5:s5;t6:s4;t7:s5;t8:s4,s6;t9:s5,s9;;",
+            "0,0,0,0,0,1,1,1,1");
+
+    System.out.println(p.getMinimalSiphons().toString());
   }
 
 }

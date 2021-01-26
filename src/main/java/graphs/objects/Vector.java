@@ -1,5 +1,7 @@
 package graphs.objects;
 
+import java.util.stream.IntStream;
+
 public interface Vector {
 
   int getDimension();
@@ -95,4 +97,7 @@ public interface Vector {
    */
   Vector copy();
 
+  IntStream stream();
+
+  //TODO: collector
 }

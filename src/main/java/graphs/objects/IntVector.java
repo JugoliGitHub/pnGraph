@@ -74,6 +74,10 @@ public class IntVector implements Vector {
     this(Stream.of(markings).mapToInt(Integer::parseInt).toArray());
   }
 
+  public IntVector() {
+    this(0);
+  }
+
   public static int ggT(IntVector vector) {
     int a = vector.vectorArray[0];
     int b = 0;
@@ -96,13 +100,13 @@ public class IntVector implements Vector {
   }
 
   @Override
-  public Vector multiply(int factor) {
+  public IntVector multiply(int factor) {
     return new IntVector(
         Arrays.stream(vectorArray).map(j -> j * factor).toArray());
   }
 
   @Override
-  public Vector add(Vector vector) {
+  public IntVector add(Vector vector) {
     if (vector.getDimension() != length) {
       return new IntVector(0);
     }
@@ -111,7 +115,7 @@ public class IntVector implements Vector {
   }
 
   @Override
-  public Vector add(int index, int value) {
+  public IntVector add(int index, int value) {
     if (index < vectorArray.length && index > 0) {
       int[] newArray = vectorArray.clone();
       newArray[index] += value;
@@ -121,7 +125,7 @@ public class IntVector implements Vector {
   }
 
   @Override
-  public Vector sub(Vector vector) {
+  public IntVector sub(Vector vector) {
     if (this.getDimension() != vector.getDimension()) {
       return new IntVector(0);
     }
@@ -131,7 +135,7 @@ public class IntVector implements Vector {
 
 
   @Override
-  public Vector sub(int index, int value) {
+  public IntVector sub(int index, int value) {
     if (index < vectorArray.length) {
       int[] tmpArray = vectorArray.clone();
       tmpArray[index] -= value;
@@ -179,6 +183,11 @@ public class IntVector implements Vector {
   }
 
   @Override
+  public IntStream stream() {
+    return Arrays.stream(vectorArray);
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -203,4 +212,5 @@ public class IntVector implements Vector {
     toReturn.append(")");
     return toReturn.toString();
   }
+
 }
