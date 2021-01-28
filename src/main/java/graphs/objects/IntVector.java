@@ -208,7 +208,11 @@ public class IntVector implements Vector {
   public String toString() {
     StringBuilder toReturn = new StringBuilder("(");
     Arrays.stream(vectorArray).forEach(value -> toReturn.append(value).append(","));
-    toReturn.deleteCharAt(toReturn.length() - 1);
+    if (length > 0) {
+      toReturn.deleteCharAt(toReturn.length() - 1);
+    } else {
+      toReturn.append(" ");
+    }
     toReturn.append(")");
     return toReturn.toString();
   }

@@ -297,7 +297,11 @@ public class Marking implements Vector {
         toReturn.append(value).append(",");
       }
     });
-    toReturn.deleteCharAt(toReturn.length() - 1);
+    if (length > 0) {
+      toReturn.deleteCharAt(toReturn.length() - 1);
+    } else {
+      toReturn.append(" ");
+    }
     toReturn.append(")");
     return toReturn.toString();
   }
