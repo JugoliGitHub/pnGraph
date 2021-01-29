@@ -90,12 +90,18 @@ public class PetriReader {
     }
   }
 
+  public static Petrinet createPetriNetAndMarkings(String name, String pnString,
+      String markingsString) {
+    namePN = name;
+    return createPetriNetAndMarkings(pnString, markingsString);
+  }
+
   /**
    * Creates a petrinet with given strings.
    *
    * @param pnString       string for the petri-net
    * @param markingsString string for the initial mark
-   * @return the constructed petri-net
+   * @return the constructed petrinet
    */
   public static Petrinet createPetriNetAndMarkings(String pnString, String markingsString) {
     Marking mue0 = new Marking(markingsString.split(","));

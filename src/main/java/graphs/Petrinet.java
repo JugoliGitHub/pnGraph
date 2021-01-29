@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,6 +28,7 @@ public class Petrinet {
   protected Matrix incidenceMatrix;
   protected Matrix forwardMatrix;
   protected Matrix backwardMatrix;
+  protected CoverabilityGraph coverabilityGraph;
 
   /**
    * Creates an empty petrinet. Will initialize mue0, places, transitions and flow.
@@ -47,6 +49,7 @@ public class Petrinet {
     setVectors();
     setInitialBoundedness();
     setPaths();
+    this.coverabilityGraph = getCoverabilityGraph();
     //TODO: create coverability graph in here
   }
 
@@ -100,23 +103,16 @@ public class Petrinet {
    * Sets the start- and end-nodes for every node.
    */
   private void setVectors() {
-    ThreadGroup group = new ThreadGroup("parallelPlacesAndTransitions");
-    new Thread(group, () ->
-        places.forEach(place -> place.setVectors(flow, transitions, transitions.size()))).start();
-    new Thread(group, () ->
-        transitions.forEach(transition -> transition.setVectors(flow, places, places.size())))
-        .start();
+    places.forEach(place -> place.setVectors(flow, transitions, transitions.size()));
+    transitions.forEach(transition -> transition.setVectors(flow, places, places.size()));
 
-    if (group.activeCount() == 0) {
-      forwardMatrix = new Matrix(transitions.stream().map(t -> t.getPostSet().intVector())
-          .toArray(IntVector[]::new), false);
-      backwardMatrix = new Matrix(transitions.stream().map(t -> t.getPostSet().intVector())
-          .toArray(IntVector[]::new), false);
-      incidenceMatrix = new Matrix(transitions.stream()
-          .map(t -> t.getPostSet().intVector().sub(t.getPreSet()))
-          .toArray(IntVector[]::new), false);
-    }
-
+    forwardMatrix = new Matrix(transitions.stream().map(t -> t.getPostSet().intVector())
+        .toArray(IntVector[]::new), false);
+    backwardMatrix = new Matrix(transitions.stream().map(t -> t.getPreSet().intVector())
+        .toArray(IntVector[]::new), false);
+    incidenceMatrix = new Matrix(transitions.stream()
+        .map(t -> t.getPostSet().intVector().sub(t.getPreSet()))
+        .toArray(IntVector[]::new), false);
   }
 
   /**
@@ -273,8 +269,18 @@ public class Petrinet {
         .collect(Collectors.toList());
   }
 
-  public CoverabilityGraph createCoverabilityGraph() {
-    return new CoverabilityGraph(mue0, this.name + "Cov", this);
+  public Optional<PurePetriNet> getSimpleNet() {
+    try {
+      return Optional
+          .of(new PurePetriNet(this.name, this.places, this.transitions, this.flow, this.mue0));
+    } catch (IllegalArgumentException e) {
+      return Optional.empty();
+    }
+
+  }
+
+  public CoverabilityGraph getCoverabilityGraph() {
+    return coverabilityGraph;
   }
 
   public List<Vector> getTransitionInvariants() {
@@ -283,6 +289,11 @@ public class Petrinet {
 
   public List<Vector> getPlaceInvariants() {
     return incidenceMatrix.minInvariants();
+  }
+
+  public List<Set<Place>> getCluster() {
+    //TODO
+    return Collections.emptyList();
   }
 
   @Override
@@ -295,7 +306,7 @@ public class Petrinet {
       } else {
         StringBuilder label = new StringBuilder();
         if (mue0.get(i) <= 6) {
-          for (int j = 0; j < i; j++) {
+          for (int j = 0; j < mue0.get(i); j++) {
             label.append("&bull;");
           }
         } else {

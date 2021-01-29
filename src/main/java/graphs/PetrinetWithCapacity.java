@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class PetrinetWithCapacity extends SimpleNet {
+public class PetrinetWithCapacity extends PurePetriNet {
 
   private final Marking capacity;
 
@@ -32,7 +32,7 @@ public class PetrinetWithCapacity extends SimpleNet {
   }
 
   @Override
-  public CoverabilityGraph createCoverabilityGraph() {
+  public CoverabilityGraph getCoverabilityGraph() {
     return new CoverabilityGraphWithCapacity(mue0, this.name + "Cov", this);
   }
 

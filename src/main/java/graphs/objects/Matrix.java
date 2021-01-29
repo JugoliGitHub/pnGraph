@@ -7,19 +7,47 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * A matrix class.
+ */
 public class Matrix {
 
-  public final IntVector[] rowArray;
-  public final IntVector[] colArray;
+  private final IntVector[] rowArray;
+  private final IntVector[] colArray;
 
   private final int n;
   private final int m;
 
+  /**
+   * Public constructor to create a matrix object of a two dimensional array.
+   *
+   * @param matrix two dimensional array
+   */
   public Matrix(int[][] matrix) {
     n = matrix.length;
     m = matrix[0].length;
     rowArray = fillRows(matrix);
     colArray = fillColumns(matrix);
+  }
+
+  /**
+   * Public constructor to create a matrix object with given rows or columns.
+   *
+   * @param rows the array of rows or columns
+   * @param row  flag indicating when the first parameter are rows
+   */
+  public Matrix(IntVector[] rows, boolean row) {
+    if (row) {
+      this.n = rows[0].getDimension();
+      this.m = rows.length;
+      rowArray = rows;
+      colArray = fillColumns(rows);
+    } else {
+      this.n = rows.length;
+      this.m = rows[0].getDimension();
+      colArray = rows;
+      rowArray = fillRows(rows);
+    }
   }
 
   private Matrix(IntVector[] rows, IntVector[] cols) {
@@ -50,20 +78,13 @@ public class Matrix {
     colArray = fillColumns(rowArray);
   }
 
-  public Matrix(IntVector[] rows, boolean row) {
-    if (row) {
-      this.n = rows[0].getDimension();
-      this.m = rows.length;
-      rowArray = rows;
-      colArray = fillColumns(rows);
-    } else {
-      this.n = rows.length;
-      this.m = rows[0].getDimension();
-      colArray = rows;
-      rowArray = fillRows(rows);
-    }
-  }
-
+  /**
+   * Creates a identity matrix object. That means every number on the diagonal is a one and every
+   * other number in the matrix is a zero.
+   *
+   * @param dimension width and height dimension
+   * @return the identity matrix
+   */
   public static Matrix identityMatrix(int dimension) {
     return new Matrix(IntStream.range(0, dimension)
         .mapToObj(row -> IntStream.range(0, dimension).map(col -> row == col ? 1 : 0).toArray())
@@ -104,6 +125,12 @@ public class Matrix {
     return n;
   }
 
+  /**
+   * Returns the row with the given row.
+   *
+   * @param s index of the row
+   * @return the vector
+   */
   public IntVector getRow(int s) {
     if (s < 0 || s >= m) {
       return new IntVector(m);
@@ -150,6 +177,11 @@ public class Matrix {
     System.out.println(stepString.toString());
   }
 
+  /**
+   * Calculates the minimal invariants of this matrix.
+   *
+   * @return list of invariants, can be empty
+   */
   public List<Vector> minInvariants() {
     Matrix di = new Matrix(this.copy(), identityMatrix(m));
     printStep(di, 0);
@@ -182,5 +214,19 @@ public class Matrix {
     return Arrays.stream(di.rowArray)
         .map(row -> new IntVector(IntStream.range(0, m).map(i -> row.get(i + n)).toArray()))
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public String toString() {
+    //TODO: implement
+    StringBuilder stepString = new StringBuilder(
+        "------------------------------------- \n");
+    IntStream.range(0, this.m).forEach(row -> {
+      IntStream.range(0, n)
+          .map(num -> this.get(row, num))
+          .forEach(num -> stepString.append(num < 0 ? (num + " ") : (" " + num + " ")));
+      stepString.append("\n");
+    });
+    return stepString.toString();
   }
 }
