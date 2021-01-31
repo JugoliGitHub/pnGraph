@@ -39,4 +39,32 @@ public class LabelledPetrinet extends Petrinet implements Labelled{
     return labels;
   }
 
+  @Override
+  public String toString() {
+    StringBuilder out = new StringBuilder(
+        String.format("digraph %s{\nnode[shape=circle];\n", name));
+    for (int i = 0; i < places.size(); i++) {
+      if (mue0.get(i) == 0) {
+        out.append("  \"").append(places.get(i).toString()).append("\";\n");
+      } else {
+        StringBuilder label = new StringBuilder();
+        if (mue0.get(i) <= 6) {
+          for (int j = 0; j < mue0.get(i); j++) {
+            label.append("&bull;");
+          }
+        } else {
+          label.append(mue0.get(i));
+        }
+        out.append("  \"").append(places.get(i).toString()).append("\" [label=\"").append(label)
+            .append("\" xlabel=\"").append(places.get(i).toString()).append("\"];\n");
+      }
+    }
+    transitions.forEach(
+        transition -> out.append("  \"").append(transition.toString()).append("\" [shape=box"
+            + " xlabel=\"").append(transition.toString()).append("\" label=\"")
+            .append(this.getLabels().get(transition)).append("\"];\n"));
+    flow.forEach(edge -> out.append(edge.toString()));
+    out.append("}");
+    return out.append("\n").toString();
+  }
 }
