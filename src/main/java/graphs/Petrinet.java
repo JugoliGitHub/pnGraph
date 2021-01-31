@@ -313,7 +313,7 @@ public class Petrinet {
           label.append(mue0.get(i));
         }
         out.append("  \"").append(places.get(i).toString()).append("\" [label=\"").append(label)
-            .append("\"];\n");
+            .append("\" xlabel=\"").append(places.get(i).toString()).append("\"];\n");
       }
     }
     transitions.forEach(
