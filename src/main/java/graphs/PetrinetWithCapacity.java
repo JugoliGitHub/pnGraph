@@ -14,7 +14,7 @@ public class PetrinetWithCapacity extends PurePetriNet {
   private final Marking capacity;
 
   /**
-   * Creates an empty petrinet. Should initialize mue_0, capacity (if present) and places,
+   * Initializes mue_0, capacity (if present) and places,
    * transitions and flow.
    *
    * @param name name of the net

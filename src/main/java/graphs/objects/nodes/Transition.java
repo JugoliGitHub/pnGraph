@@ -10,6 +10,7 @@ public class Transition extends Node {
   // -1: dead; 0: not dead; 1: weak liveness; 2: alive
   int liveness;
 
+  //TODO: labels in transition
 
   /**
    * Constructor of a transition.
