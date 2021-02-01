@@ -22,6 +22,7 @@ public class Playground {
       System.out.println(s.getMinimalSiphons().toString());
       System.out.println(s.getLiveness());
     });
+    System.out.println(p.getCoverabilityGraph());
 
     Petrinet pnUe43b = PetriReader.createPetriNetAndMarkings("ue43",
         "s1:t2;s2:t1;s3:t3;s4:t3;s5:t4;;t1:s1;t2:s2,s3;t3:s5;t4:s4;;", "1,0,0,1,0");

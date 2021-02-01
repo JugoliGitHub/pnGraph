@@ -50,7 +50,7 @@ public class Petrinet {
     setVectors();
     setInitialBoundedness();
     setPaths();
-    this.coverabilityGraph = getCoverabilityGraph();
+    this.coverabilityGraph = new CoverabilityGraph(mue0, this.name + "Cov", this);
     //TODO: create coverability graph in here
   }
 
@@ -281,7 +281,7 @@ public class Petrinet {
   }
 
   public CoverabilityGraph getCoverabilityGraph() {
-    return new CoverabilityGraph(mue0, this.name + "Cov", this);
+    return coverabilityGraph;
   }
 
   public List<Vector> getTransitionInvariants() {
