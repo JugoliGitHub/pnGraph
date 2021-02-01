@@ -8,6 +8,7 @@ import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Node;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -280,7 +281,7 @@ public class Petrinet {
   }
 
   public CoverabilityGraph getCoverabilityGraph() {
-    return coverabilityGraph;
+    return new CoverabilityGraph(mue0, this.name + "Cov", this);
   }
 
   public List<Vector> getTransitionInvariants() {
@@ -294,6 +295,11 @@ public class Petrinet {
   public List<Set<Place>> getCluster() {
     //TODO
     return Collections.emptyList();
+  }
+
+  public TerminalPetrinet getTerminal(Set<Marking> terminalMarkings) {
+    return new TerminalPetrinet(name + "Terminal", new ArrayList<>(places),
+        new ArrayList<>(transitions), new ArrayList<>(flow), terminalMarkings, mue0.copy());
   }
 
   @Override
