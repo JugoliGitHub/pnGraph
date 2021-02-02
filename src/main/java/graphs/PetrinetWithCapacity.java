@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class PetrinetWithCapacity extends PurePetriNet {
+public class PetrinetWithCapacity extends PurePetrinet {
 
   private final Marking capacity;
 

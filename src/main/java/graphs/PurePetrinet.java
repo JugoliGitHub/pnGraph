@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class PurePetriNet extends Petrinet {
+public class PurePetrinet extends Petrinet {
 
   public Map<Place, Set<Transition>> preSetOfPlaces;
   public Map<Place, Set<Transition>> postSetOfPlaces;
@@ -34,7 +34,7 @@ public class PurePetriNet extends Petrinet {
    * @param flow
    * @param mue0
    */
-  public PurePetriNet(String name, List<Place> places, List<Transition> transitions,
+  public PurePetrinet(String name, List<Place> places, List<Transition> transitions,
       List<Edge> flow,
       Marking mue0) {
     super(name, places, transitions, flow, mue0);
@@ -49,10 +49,11 @@ public class PurePetriNet extends Petrinet {
 
   @Override
   protected boolean isNotCorrect() {
-    return !isSameLength() || !(transitions.size() > 0) || !isConnected() || containsLoop()
+    return isNotSameLength() || !(transitions.size() > 0) || !isConnected() || containsLoop()
         || !containsMultiEdges();
   }
 
+  //TODO: implement
   private boolean containsMultiEdges() {
     return true;
   }
@@ -86,6 +87,11 @@ public class PurePetriNet extends Petrinet {
     });
   }
 
+  /**
+   * An algorithm to get the minimal siphons of a pure petrinet.
+   *
+   * @return a list of siphons
+   */
   public List<Set<Place>> getMinimalSiphons() {
     Set<Place> q = new HashSet<>();
     Set<Place> r = new HashSet<>(places);
@@ -135,7 +141,7 @@ public class PurePetriNet extends Petrinet {
   }
 
   private Set<Place> getNewPlaces(Set<Place> set) {
-    // • (• B − B • )
+    // •(•B − B•)
     return set.stream()
         .map(preSetOfPlaces::get)
         .flatMap(Set::stream)

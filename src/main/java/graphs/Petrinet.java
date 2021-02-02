@@ -8,6 +8,7 @@ import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Node;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,7 +18,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+/**
+ * The petrinet class.
+ */
 public class Petrinet {
 
   protected final String name;
@@ -51,7 +56,6 @@ public class Petrinet {
     setInitialBoundedness();
     setPaths();
     this.coverabilityGraph = new CoverabilityGraph(mue0, this.name + "Cov", this);
-    //TODO: create coverability graph in here
   }
 
   public Marking getMue0() {
@@ -86,22 +90,8 @@ public class Petrinet {
     return incidenceMatrix;
   }
 
-  //TODO  return new Petrinet with an extra place
-  //TODO: change vector mue 0
-  private void addPlace(Place place) {
-    places.add(place);
-  }
-
-  private void addTransition(Transition transition) {
-    this.transitions.add(transition);
-  }
-
-  private void addEdge(Edge<? extends Node, ? extends Node> edge) {
-    flow.add(edge);
-  }
-
   /**
-   * Sets the start- and end-nodes for every node.
+   * Sets the start- and end-nodes for every node. Also creates matrices of this petrinet.
    */
   private void setVectors() {
     places.forEach(place -> place.setVectors(flow, transitions, transitions.size()));
@@ -145,11 +135,11 @@ public class Petrinet {
    * @return true, when this net is correct
    */
   protected boolean isNotCorrect() {
-    return !isSameLength() || !(transitions.size() > 0);
+    return isNotSameLength() || !(transitions.size() > 0);
   }
 
-  protected final boolean isSameLength() {
-    return mue0.getDimension() == places.size();
+  protected final boolean isNotSameLength() {
+    return mue0.getDimension() != places.size();
   }
 
   protected final boolean isConnected() {
@@ -236,15 +226,31 @@ public class Petrinet {
             .max(places.stream().map(Place::getBoundedness).collect(Collectors.toList())));
   }
 
+  public CoverabilityGraph getCoverabilityGraph() {
+    return coverabilityGraph;
+  }
+
+  public List<Vector> getTransitionInvariants() {
+    return incidenceMatrix.transposed().minInvariants();
+  }
+
+  public List<Vector> getPlaceInvariants() {
+    return incidenceMatrix.minInvariants();
+  }
+
+  //TODO: implement
+  public List<Set<Place>> getCluster() {
+    return Collections.emptyList();
+  }
+
   /**
    * Returns the reversed net. That means that the flow changes its direction.
    *
    * @return a reversed petrinet
    */
   public Petrinet reversed() {
-    return new Petrinet(this.name + "Reversed", List.copyOf(places),
-        List.copyOf(transitions), flow.stream().map(Edge::reverse).collect(Collectors.toList()),
-        mue0.copy());
+    return new Petrinet(this.name + "Reversed", List.copyOf(places), List.copyOf(transitions),
+        flow.stream().map(Edge::reverse).collect(Collectors.toList()), mue0.copy());
   }
 
   /**
@@ -270,42 +276,94 @@ public class Petrinet {
         .collect(Collectors.toList());
   }
 
-  public Optional<PurePetriNet> getSimpleNet() {
+  /**
+   * Returns this petrinet as a pure petrinet, when it can be created. The optional is empty when it
+   * could not be created.
+   *
+   * @return - optional of a pure petrinet
+   */
+  public Optional<PurePetrinet> getPureNet() {
     try {
       return Optional
-          .of(new PurePetriNet(this.name, this.places, this.transitions, this.flow, this.mue0));
+          .of(new PurePetrinet(this.name, this.places, this.transitions, this.flow, this.mue0));
     } catch (IllegalArgumentException e) {
       return Optional.empty();
     }
-
   }
 
-  public CoverabilityGraph getCoverabilityGraph() {
-    return coverabilityGraph;
-  }
+  /**
+   * Returns a new petrinet with terminal markings
+   *
+   * @param terminalMarkings
+   * @return
+   */
+  public Petrinet getNormalform(Set<Marking> terminalMarkings) {
+    List<Place> placesIO = new ArrayList<>(places);
+    Place sIn = new Place("sIn");
+    Place sOut = new Place("sOut");
+    Place sRun = new Place("sRun");
+    placesIO.addAll(List.of(sIn, sOut, sRun));
 
-  public List<Vector> getTransitionInvariants() {
-    return incidenceMatrix.transposed().minInvariants();
-  }
+    Marking mue0io = new Marking(placesIO.size()).add(places.size(), 1);
 
-  public List<Vector> getPlaceInvariants() {
-    return incidenceMatrix.minInvariants();
-  }
+    List<Transition> transitionsio = new ArrayList<>(transitions);
+    List<Edge> flowio = new ArrayList<>(flow);
+    transitionsio.forEach(
+        transition -> flowio
+            .addAll(List.of(new Edge(transition, sRun), new Edge(sRun, transition))));
+    List<Transition> transitionsStart = transitionsio.stream()
+        .filter(transition -> transition.getPreSet().lessEquals(mue0))
+        .map(transition -> {
+          Transition newTransition = new Transition(transition.getLabel() + "'");
 
-  public List<Set<Place>> getCluster() {
-    //TODO
-    return Collections.emptyList();
-  }
+          flowio.addAll(List.of(new Edge(sIn, newTransition), new Edge(newTransition, sRun)));
+          IntStream.range(0, places.size())
+              .filter(i -> mue0.sub(transition.getPreSet()).add(transition.getPostSet()).get(i) > 0)
+              .forEach(i -> flowio.add(new Edge(newTransition, places.get(i))));
 
-  public TerminalPetrinet getTerminal(Set<Marking> terminalMarkings) {
-    return new TerminalPetrinet(name + "Terminal", new ArrayList<>(places),
-        new ArrayList<>(transitions), new ArrayList<>(flow), terminalMarkings, mue0.copy());
+          return newTransition;
+        })
+        .collect(Collectors.toList());
+
+    List<Transition> transitionsEnd = transitionsio.stream()
+        .filter(
+            transition -> terminalMarkings.stream().anyMatch(transition.getPostSet()::lessEquals))
+        .map(
+            transition ->
+                new SimpleEntry<Transition, Marking>(transition,
+                    terminalMarkings.stream().filter(transition.getPostSet()::lessEquals)
+                        .findFirst().get()))
+        .map(entry -> {
+          Transition newTransition = new Transition(entry.getKey().getLabel() + "''");
+          flowio.addAll(List.of(new Edge(sRun, newTransition), new Edge(newTransition, sOut)));
+
+          IntStream.range(0, places.size())
+              .filter(i ->
+                  entry.getValue().sub(entry.getKey().getPostSet()).add(entry.getKey().getPreSet())
+                      .get(i) > 0)
+              .forEach(i -> flowio.add(new Edge(places.get(i), newTransition)));
+
+          return newTransition;
+        })
+        .collect(Collectors.toList());
+    transitionsio.addAll(transitionsStart);
+    transitionsio.addAll(transitionsEnd);
+    return new Petrinet(name + "Normal", placesIO, transitionsio, flowio, mue0io);
   }
 
   @Override
   public String toString() {
-    StringBuilder out = new StringBuilder(String
-        .format("digraph %s{\nnode[shape=circle];\n", name));
+    StringBuilder out = createPlacesOfString();
+    transitions.forEach(
+        transition -> out.append("  \"").append(transition.toString()).append("\" [shape=box];\n"));
+    flow.forEach(edge -> out.append(edge.toString()));
+    out.append("}");
+    return out.append("\n").toString();
+  }
+
+  protected StringBuilder createPlacesOfString() {
+    StringBuilder out = new StringBuilder(
+        String.format("digraph %s{\nnode[shape=circle];\n", name));
     for (int i = 0; i < places.size(); i++) {
       if (mue0.get(i) == 0) {
         out.append("  \"").append(places.get(i).toString()).append("\";\n");
@@ -322,11 +380,7 @@ public class Petrinet {
             .append("\" xlabel=\"").append(places.get(i).toString()).append("\"];\n");
       }
     }
-    transitions.forEach(
-        transition -> out.append("  \"").append(transition.toString()).append("\" [shape=box];\n"));
-    flow.forEach(edge -> out.append(edge.toString()));
-    out.append("}");
-    return out.append("\n").toString();
+    return out;
   }
 
   /**
@@ -336,7 +390,7 @@ public class Petrinet {
    * @return boolean if true
    */
   public boolean equals(Petrinet petrinet) {
-    //TODO: implement
+    // TODO: implement
     // two nets can be equal beside their place/transition names
     return false;
   }
