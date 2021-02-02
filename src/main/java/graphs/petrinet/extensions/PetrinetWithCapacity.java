@@ -12,21 +12,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * A petrinet where each place has a capacity. In our lecture only pure petrinets have a capacity.
+ */
 public class PetrinetWithCapacity extends PurePetrinet {
 
   private final Marking capacity;
 
   /**
-   * Initializes mue_0, capacity (if present) and places,
-   * transitions and flow.
+   * Initializes mue_0, capacity (if present) and places, transitions and flow.
    *
-   * @param name name of the net
+   * @param name        name of the net
+   * @param places      places of pure net
+   * @param transitions transitions
+   * @param flow        edges between nodes
+   * @param mue0        start marking
+   * @param capacity    maximal tokes for every place
    */
   public PetrinetWithCapacity(String name, List<Place> places, List<Transition> transitions,
       List<Edge> flow, Marking mue0, Marking capacity) {
     super(name, places, transitions, flow, mue0);
     this.capacity = capacity;
-    IntStream.range(0, places.size()).forEach(i -> places.get(i).setBoundedness(capacity.get(i)));
     IntStream.range(0, places.size()).forEach(i -> places.get(i).setCapacity(capacity.get(i)));
   }
 

@@ -15,6 +15,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * A different type of petrinet. This petrinet has no loops and no multiple edges.
+ */
 public class PurePetrinet extends Petrinet {
 
   public Map<Place, Set<Transition>> preSetOfPlaces;
@@ -27,25 +30,20 @@ public class PurePetrinet extends Petrinet {
   List<Set<Place>> old;
 
   /**
-   * Initialize mue0, capacity (if present) and places, transitions and flow.
+   * Initialize mue0, places, transitions and flow. The pure petrinet only has no loops, so each
+   * note in pre- and post-set can be saved.
    *
    * @param name        name of the net
    * @param places      places of pure net
-   * @param transitions
-   * @param flow
-   * @param mue0
+   * @param transitions transitions
+   * @param flow        edges between nodes
+   * @param mue0        start marking
    */
   public PurePetrinet(String name, List<Place> places, List<Transition> transitions,
       List<Edge> flow,
       Marking mue0) {
     super(name, places, transitions, flow, mue0);
     fillMaps();
-  }
-
-  private static ArrayList<Set<Place>> minimize(List<Set<Place>> setList, Set<Place> b) {
-    return setList.stream()
-        .filter(set -> !set.containsAll(b))
-        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   @Override
@@ -88,6 +86,31 @@ public class PurePetrinet extends Petrinet {
     });
   }
 
+  public boolean isPlaceNet() {
+    return transitions.stream().allMatch(t -> postSetOfTransitions.get(t).size() == 1
+        && preSetOfTransitions.get(t).size() == 1);
+  }
+
+  public boolean isTransitionNet() {
+    return places.stream().allMatch(p -> postSetOfPlaces.get(p).size() == 1
+        && preSetOfPlaces.get(p).size() == 1);
+  }
+
+  public boolean isFreeChoice() {
+    return flow.stream()
+        .filter(edge -> edge.getFrom() instanceof Place && edge.getTo() instanceof Transition)
+        .allMatch(edge -> postSetOfPlaces.get(edge.getFrom()).size() == 1
+            || preSetOfTransitions.get(edge.getTo()).size() == 1);
+  }
+
+  @Override
+  public int getLiveness() {
+    return
+        isPlaceNet() && isStronglyConnected() && mue0.stream().reduce(Integer::sum).getAsInt() > 0
+            ? 2
+            : super.getLiveness();
+  }
+
   /**
    * An algorithm to get the minimal siphons of a pure petrinet.
    *
@@ -127,6 +150,12 @@ public class PurePetrinet extends Petrinet {
     }
   }
 
+  private static ArrayList<Set<Place>> minimize(List<Set<Place>> setList, Set<Place> b) {
+    return setList.stream()
+        .filter(set -> !set.containsAll(b))
+        .collect(Collectors.toCollection(ArrayList::new));
+  }
+
   private boolean isSiphon(Set<Place> set) {
     return set.stream()
         .map(preSetOfPlaces::get)
@@ -154,31 +183,6 @@ public class PurePetrinet extends Petrinet {
         .stream().map(preSetOfTransitions::get)
         .flatMap(Set::stream)
         .collect(Collectors.toSet());
-  }
-
-  public boolean isPlaceNet() {
-    return transitions.stream().allMatch(t -> postSetOfTransitions.get(t).size() == 1
-        && preSetOfTransitions.get(t).size() == 1);
-  }
-
-  public boolean isTransitionNet() {
-    return places.stream().allMatch(p -> postSetOfPlaces.get(p).size() == 1
-        && preSetOfPlaces.get(p).size() == 1);
-  }
-
-  public boolean isFreeChoice() {
-    return flow.stream()
-        .filter(edge -> edge.getFrom() instanceof Place && edge.getTo() instanceof Transition)
-        .allMatch(edge -> postSetOfPlaces.get(edge.getFrom()).size() == 1
-            || preSetOfTransitions.get(edge.getTo()).size() == 1);
-  }
-
-  @Override
-  public int getLiveness() {
-    return
-        isPlaceNet() && isStronglyConnected() && mue0.stream().reduce(Integer::sum).getAsInt() > 0
-            ? 2
-            : super.getLiveness();
   }
 
 }
