@@ -1,6 +1,7 @@
-package graphs;
+package graphs.coverabilitygraphs;
 
 import exception.WrongDimensionException;
+import graphs.petrinet.Petrinet;
 import graphs.objects.Marking;
 import graphs.objects.edges.CoverabilityGraphEdge;
 import graphs.objects.nodes.Transition;

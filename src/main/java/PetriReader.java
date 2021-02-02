@@ -1,8 +1,8 @@
 import exception.NotExistingNodeException;
 import exception.WrongDimensionException;
-import graphs.CoverabilityGraph;
-import graphs.Petrinet;
-import graphs.PetrinetWithCapacity;
+import graphs.coverabilitygraphs.CoverabilityGraph;
+import graphs.petrinet.Petrinet;
+import graphs.petrinet.extensions.PetrinetWithCapacity;
 import graphs.objects.Marking;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Place;

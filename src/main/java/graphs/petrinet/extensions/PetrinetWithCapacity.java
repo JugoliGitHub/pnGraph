@@ -1,9 +1,12 @@
-package graphs;
+package graphs.petrinet.extensions;
 
+import graphs.coverabilitygraphs.CoverabilityGraph;
+import graphs.coverabilitygraphs.CoverabilityGraphWithCapacity;
 import graphs.objects.Marking;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
+import graphs.petrinet.Petrinet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

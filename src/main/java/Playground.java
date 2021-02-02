@@ -1,4 +1,4 @@
-import graphs.Petrinet;
+import graphs.petrinet.Petrinet;
 import graphs.objects.Marking;
 import java.util.Set;
 

@@ -1,6 +1,7 @@
-package graphs;
+package graphs.coverabilitygraphs;
 
 import exception.WrongDimensionException;
+import graphs.petrinet.extensions.PetrinetWithCapacity;
 import graphs.objects.Marking;
 import graphs.objects.nodes.Transition;
 import java.util.ArrayList;

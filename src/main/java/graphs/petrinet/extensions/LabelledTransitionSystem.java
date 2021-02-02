@@ -1,6 +1,8 @@
-package graphs;
+package graphs.petrinet.extensions;
 
+import graphs.coverabilitygraphs.CoverabilityGraph;
 import graphs.objects.Marking;
+import graphs.petrinet.Petrinet;
 import java.util.List;
 import java.util.Map;
 

@@ -1,9 +1,10 @@
-package graphs;
+package graphs.petrinet;
 
 import graphs.objects.Marking;
 import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
+import graphs.petrinet.extensions.PetrinetWithCapacity;
 import java.util.List;
 
 /**

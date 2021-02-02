@@ -1,5 +1,6 @@
-package graphs;
+package graphs.petrinet;
 
+import graphs.coverabilitygraphs.CoverabilityGraph;
 import graphs.objects.IntVector;
 import graphs.objects.Marking;
 import graphs.objects.Matrix;
@@ -8,6 +9,7 @@ import graphs.objects.edges.Edge;
 import graphs.objects.nodes.Node;
 import graphs.objects.nodes.Place;
 import graphs.objects.nodes.Transition;
+import graphs.petrinet.extensions.PurePetrinet;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
