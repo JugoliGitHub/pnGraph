@@ -12,11 +12,13 @@ import graphs.objects.nodes.Transition;
 import graphs.petrinet.extensions.PurePetrinet;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -252,7 +254,17 @@ public class Petrinet {
    */
   public Petrinet reversed() {
     return new Petrinet(this.name + "Reversed", List.copyOf(places), List.copyOf(transitions),
-        flow.stream().map(Edge::reverse).collect(Collectors.toList()), mue0.copy());
+        flow.stream().map(Edge::reverse).map(edge -> {
+          if (edge.getFrom() instanceof Place) {
+            Place from = places.stream().filter(edge.getFrom()::equals).findFirst().get();
+            Transition to = transitions.stream().filter(edge.getTo()::equals).findFirst().get();
+            return new Edge<>(from, to);
+          } else {
+            Transition from = transitions.stream().filter(edge.getFrom()::equals).findFirst().get();
+            Place to = places.stream().filter(edge.getTo()::equals).findFirst().get();
+            return new Edge<>(from, to);
+          }
+        }).collect(Collectors.toList()), mue0.copy());
   }
 
   /**
@@ -264,8 +276,23 @@ public class Petrinet {
   public Petrinet dual() {
     List<Place> newPlaces = reverseTransitionsToPlaces();
     List<Transition> newTransitions = reversePlacesToTransitions();
-    return new Petrinet(this.name + "Dual", newPlaces, newTransitions, List.copyOf(flow),
-        new Marking(newPlaces.size()));
+    return new Petrinet(this.name + "Dual", newPlaces, newTransitions,
+        flow.stream().map(edge -> {
+          if (edge.getFrom() instanceof Transition) {
+            return new Edge<>(newPlaces.stream()
+                .filter(place -> edge.getFrom().getLabel().equals(place.getLabel())).findFirst()
+                .get(), newTransitions.stream()
+                .filter(transition -> edge.getTo().getLabel().equals(transition.getLabel()))
+                .findFirst().get());
+          } else {
+            return new Edge<>(newTransitions.stream()
+                .filter(transition -> edge.getFrom().getLabel().equals(transition.getLabel()))
+                .findFirst()
+                .get(), newPlaces.stream()
+                .filter(place -> edge.getTo().getLabel().equals(place.getLabel()))
+                .findFirst().get());
+          }
+        }).collect(Collectors.toList()), new Marking(newPlaces.size()));
   }
 
   private List<Place> reverseTransitionsToPlaces() {
@@ -330,23 +357,46 @@ public class Petrinet {
     List<Transition> transitionsEnd = transitionsio.stream()
         .filter(
             transition -> terminalMarkings.stream().anyMatch(transition.getPostSet()::lessEquals))
-        .map(
-            transition ->
-                new SimpleEntry<Transition, Marking>(transition,
-                    terminalMarkings.stream().filter(transition.getPostSet()::lessEquals)
-                        .findFirst().get()))
-        .map(entry -> {
-          Transition newTransition = new Transition(entry.getKey().getLabel() + "''");
-          flowio.addAll(List.of(new Edge(sRun, newTransition), new Edge(newTransition, sOut)));
+        .map(transition -> terminalMarkings.stream()
+            .filter(transition.getPostSet()::lessEquals)
+            .map(terminalMarking -> new SimpleEntry<Transition, Marking>(transition,
+                terminalMarking))
+            .collect(Collectors.toList()))
+        .map(list -> {
+          if (list.size() == 1) {
+            Entry<Transition, Marking> entry = list.get(0);
+            Transition newTransition = new Transition(entry.getKey().getLabel() + "''");
+            flowio.addAll(List.of(new Edge(sRun, newTransition), new Edge(newTransition, sOut)));
 
-          IntStream.range(0, places.size())
-              .filter(i ->
-                  entry.getValue().sub(entry.getKey().getPostSet()).add(entry.getKey().getPreSet())
-                      .get(i) > 0)
-              .forEach(i -> flowio.add(new Edge(places.get(i), newTransition)));
+            IntStream.range(0, places.size())
+                .filter(i ->
+                    entry.getValue().sub(entry.getKey().getPostSet())
+                        .add(entry.getKey().getPreSet())
+                        .get(i) > 0)
+                .forEach(i -> flowio.add(new Edge(places.get(i), newTransition)));
+            return List.of(newTransition);
+          } else if (list.size() > 1) {
+            List<Transition> listReturn = new ArrayList<>();
+            for (int j = 0; j < list.size(); j++) {
+              Entry<Transition, Marking> entry = list.get(j);
+              Transition newTransition = new Transition(entry.getKey().getLabel() + Character
+                  .toString('a' + j) + "''");
+              flowio.addAll(List.of(new Edge(sRun, newTransition), new Edge(newTransition, sOut)));
 
-          return newTransition;
+              IntStream.range(0, places.size())
+                  .filter(i ->
+                      entry.getValue().sub(entry.getKey().getPostSet())
+                          .add(entry.getKey().getPreSet())
+                          .get(i) > 0)
+                  .forEach(i -> flowio.add(new Edge(places.get(i), newTransition)));
+
+              listReturn.add(newTransition);
+            }
+            return listReturn;
+          }
+          return new ArrayList<Transition>();
         })
+        .flatMap(Collection::stream)
         .collect(Collectors.toList());
     transitionsio.addAll(transitionsStart);
     transitionsio.addAll(transitionsEnd);

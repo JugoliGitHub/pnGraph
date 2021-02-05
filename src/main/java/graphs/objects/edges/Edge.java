@@ -22,7 +22,8 @@ public class Edge<K extends Node, V extends Node> {
   }
 
   public Edge<V, K> reverse() {
-    return new Edge<>(this.getTo(), this.getFrom());
+    Edge<V, K> newEdge = new Edge<>(this.getTo(), this.getFrom());
+    return newEdge;
   }
 
   @Override
