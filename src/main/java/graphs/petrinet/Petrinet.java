@@ -214,6 +214,7 @@ public class Petrinet {
    * @return -1: dead; 0: not dead; 1: weak liveness; 2: alive
    */
   public int getLiveness() {
+    transitions.forEach(t -> System.out.println(t.getLabel() + " " + t.getLiveness()));
     return Collections
         .min(transitions.stream().map(Transition::getLiveness).collect(Collectors.toList()));
   }

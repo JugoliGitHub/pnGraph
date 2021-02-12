@@ -154,9 +154,6 @@ public class CoverabilityGraph {
     for (Transition transition : petrinet.getTransitions()) {
       fire(mue, transition).ifPresent(newMue -> {
         setOmega(newMue, path);
-        if (newMue.containsOmega()) {
-          transition.setLiveness(1);
-        }
         IntStream.range(0, newMue.getDimension())
             .forEach(i -> petrinet.getPlaces().get(i).setBoundednessIfHigher(newMue.get(i)));
         addToMarkings(newMue);
@@ -171,10 +168,8 @@ public class CoverabilityGraph {
   }
 
   protected void setLiveness(Transition transition) {
-    //TODO: when is alive?
-    if (knots.stream().filter(k -> k.getTransition() == transition).allMatch(this::findLoop)) {
-      transition.setLiveness(2);
-    } else if (knots.stream().filter(k -> k.getTransition() == transition)
+    //TODO: alive
+    if (knots.stream().filter(k -> k.getTransition() == transition)
         .anyMatch(this::findLoop)) {
       transition.setLiveness(1);
     } else if (knots.stream().anyMatch(k -> k.getTransition() == transition)) {
@@ -186,8 +181,7 @@ public class CoverabilityGraph {
 
   private boolean findLoop(CoverabilityGraphEdge edge) {
     return knots.stream().filter(edge2 -> edge2.getFrom().equals(edge.getTo()))
-        .map(knot -> findLoopRecursive(edge.getFrom(), new ArrayList<>(), knot)).findFirst()
-        .isPresent();
+        .anyMatch(knot -> findLoopRecursive(edge.getFrom(), new ArrayList<>(), knot));
   }
 
   private boolean findLoopRecursive(Marking from, List<Marking> visitedMarkings,
@@ -200,7 +194,7 @@ public class CoverabilityGraph {
     } else {
       visitedMarkings.add(edgeTo);
       return knots.stream().filter(edge2 -> edge2.getFrom().equals(edgeTo))
-          .map(knot -> findLoopRecursive(from, visitedMarkings, knot)).findFirst().isPresent();
+          .anyMatch(knot -> findLoopRecursive(from, visitedMarkings, knot));
     }
   }
 
