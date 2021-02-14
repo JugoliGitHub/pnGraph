@@ -1,10 +1,10 @@
 package graphs.coverabilitygraphs;
 
 import exception.WrongDimensionException;
-import graphs.petrinet.Petrinet;
 import graphs.objects.Marking;
 import graphs.objects.edges.CoverabilityGraphEdge;
 import graphs.objects.nodes.Transition;
+import graphs.petrinet.Petrinet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -54,6 +54,18 @@ public class CoverabilityGraph {
     markings.add(this.mue0);
 
     this.visited = new ArrayList<>();
+  }
+
+  /**
+   * Changes a markings elements to omega, when markings on the path are less than the mue.
+   *
+   * @param mue  the current marking
+   * @param path the last markings to reach mue
+   */
+  private static void setOmega(Marking mue, List<Marking> path) {
+    path.stream()
+        .filter(waypoint -> waypoint.lessThan(mue))
+        .forEach(mue::setOmegas);
   }
 
   /**
@@ -121,24 +133,12 @@ public class CoverabilityGraph {
       Marking newMue = (Marking) mue.sub(transition.getPreSet()).add(transition.getPostSet());
       setBoundednessOfPlaces(mue, newMue);
       if (transition.isDead()) {
-        transition.setLiveness(0);
+        transition.updateLiveness(0);
       }
       return Optional.of(newMue);
     } else {
       return Optional.empty();
     }
-  }
-
-  /**
-   * Changes a markings elements to omega, when markings on the path are less than the mue.
-   *
-   * @param mue  the current marking
-   * @param path the last markings to reach mue
-   */
-  private static void setOmega(Marking mue, List<Marking> path) {
-    path.stream()
-        .filter(waypoint -> waypoint.lessThan(mue))
-        .forEach(mue::setOmegas);
   }
 
   /**
@@ -168,14 +168,17 @@ public class CoverabilityGraph {
   }
 
   protected void setLiveness(Transition transition) {
-    //TODO: alive
-    if (knots.stream().filter(k -> k.getTransition() == transition)
-        .anyMatch(this::findLoop)) {
-      transition.setLiveness(1);
+    //TODO: alive correct?
+    if (markings.stream().allMatch(m ->
+        knots.stream().anyMatch(k -> k.getFrom().equals(m) && k.getTransition() == transition))) {
+      transition.updateLiveness(2);
+    } else if (knots.stream().filter(k -> k.getTransition() == transition)
+        .anyMatch(this::findLoop) && this.knots.size() > 0) {
+      transition.updateLiveness(1);
     } else if (knots.stream().anyMatch(k -> k.getTransition() == transition)) {
-      transition.setLiveness(0);
+      transition.updateLiveness(0);
     } else {
-      transition.setLiveness(-1);
+      transition.updateLiveness(-1);
     }
   }
 

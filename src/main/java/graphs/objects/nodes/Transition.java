@@ -53,7 +53,7 @@ public class Transition extends Node {
    *
    * @param liveness -1: dead; 0: not dead; 1: weak liveness; 2: alive
    */
-  public void setLiveness(int liveness) {
+  public void updateLiveness(int liveness) {
     if (liveness >= -1 && liveness <= 2) {
       if (this.liveness < liveness) {
         this.liveness = liveness;

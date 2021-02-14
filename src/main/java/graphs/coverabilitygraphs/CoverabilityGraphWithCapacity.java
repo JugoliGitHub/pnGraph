@@ -49,7 +49,7 @@ public class CoverabilityGraphWithCapacity extends CoverabilityGraph {
       return Optional.empty();
     }
     if (transition.isDead()) {
-      transition.setLiveness(0);
+      transition.updateLiveness(0);
     }
     return Optional.of(newMue);
   }

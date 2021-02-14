@@ -254,15 +254,21 @@ public class Petrinet {
    * @return a reversed petrinet
    */
   public Petrinet reversed() {
-    return new Petrinet(this.name + "Reversed", List.copyOf(places), List.copyOf(transitions),
+    List<Place> newPlaces = places.stream()
+        .map(place -> new Place(place.getLabel()))
+        .collect(Collectors.toList());
+    List<Transition> newTransitions = transitions.stream()
+        .map(transition -> new Transition(transition.getLabel()))
+        .collect(Collectors.toList());
+    return new Petrinet(this.name + "Reversed", newPlaces, newTransitions,
         flow.stream().map(Edge::reverse).map(edge -> {
           if (edge.getFrom() instanceof Place) {
-            Place from = places.stream().filter(edge.getFrom()::equals).findFirst().get();
-            Transition to = transitions.stream().filter(edge.getTo()::equals).findFirst().get();
+            Place from = newPlaces.stream().filter(edge.getFrom()::equals).findFirst().get();
+            Transition to = newTransitions.stream().filter(edge.getTo()::equals).findFirst().get();
             return new Edge<>(from, to);
           } else {
-            Transition from = transitions.stream().filter(edge.getFrom()::equals).findFirst().get();
-            Place to = places.stream().filter(edge.getTo()::equals).findFirst().get();
+            Transition from = newTransitions.stream().filter(edge.getFrom()::equals).findFirst().get();
+            Place to = newPlaces.stream().filter(edge.getTo()::equals).findFirst().get();
             return new Edge<>(from, to);
           }
         }).collect(Collectors.toList()), mue0.copy());
