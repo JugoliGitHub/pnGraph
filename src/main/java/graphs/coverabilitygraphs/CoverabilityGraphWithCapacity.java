@@ -24,8 +24,7 @@ public class CoverabilityGraphWithCapacity extends CoverabilityGraph {
    */
   public CoverabilityGraphWithCapacity(Marking mue0, String name, PetrinetWithCapacity petrinet)
       throws WrongDimensionException {
-    super(mue0, name);
-    this.petrinet = petrinet;
+    super(mue0, name, petrinet);
     capacity = petrinet.getCapacity();
     ArrayList<Marking> path = new ArrayList<>();
     path.add(mue0);

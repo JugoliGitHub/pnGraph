@@ -1,6 +1,7 @@
 package graphs.petrinet;
 
 import graphs.coverabilitygraphs.CoverabilityGraph;
+import graphs.coverabilitygraphs.ReachabilityGraph;
 import graphs.objects.IntVector;
 import graphs.objects.Marking;
 import graphs.objects.Matrix;
@@ -35,9 +36,11 @@ public class Petrinet {
   protected final List<Edge> flow;
   protected final Map<Place, Set<Place>> pathsFromPlace;
   protected Marking mue0;
+
   protected Matrix incidenceMatrix;
   protected Matrix forwardMatrix;
   protected Matrix backwardMatrix;
+
   protected CoverabilityGraph coverabilityGraph;
 
   /**
@@ -233,6 +236,10 @@ public class Petrinet {
 
   public CoverabilityGraph getCoverabilityGraph() {
     return coverabilityGraph;
+  }
+
+  public ReachabilityGraph getReachabilityGraph(int depth) {
+    return new ReachabilityGraph(mue0, this.name + "Err", this, depth);
   }
 
   public List<Vector> getTransitionInvariants() {
