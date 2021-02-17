@@ -21,7 +21,7 @@ public class Playground {
     System.out.println(p.getReachabilityGraph(5));
     //System.out.println(p.getPlaceInvariants());
     //System.out.println("CoFallen: " + p.getPureNet().get().getMinimalSiphons());
-   // System.out.println("Fallen: " + p.reversed().getPureNet().get().getMinimalSiphons());
+    //System.out.println("Fallen: " + p.reversed().getPureNet().get().getMinimalSiphons());
     // System.out.println(pnUe43a.getCoverabilityGraph());
   }
 
